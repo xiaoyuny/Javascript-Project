@@ -1,10 +1,10 @@
-# JavaScript Project - Line Weaver
+# Line Weaver
 
 [Live Link](https://github.com/xiaoyuny/javascript-project)
 
 ## Background and Overview
 
-`Line Weaver` is a simple and easy game to pick up quickly. A few lines can weave countless wonderful patterns! Drag any time to a point, and divide it into two new lines; the new lines can also be divided.
+`Line Weaver` is a simple and easy game to pick up quickly. A few lines can weave countless wonderful patterns! Drag any line to a point, and divide it into two new lines; the new lines can also be divided.
 
 ## Functionality and MVP Features
 
