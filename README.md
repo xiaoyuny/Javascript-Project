@@ -1,7 +1,6 @@
 # JavaScript Project - Line Weaver
 
 [Live Link](https://github.com/xiaoyuny/javascript-project)
-(not online yet)
 
 ## Background and Overview
 
@@ -9,11 +8,11 @@
 
 ## Functionality and MVP Features
 
--[ ] View board and goals
+- [ ] View board and goals
 
--[ ] Hear sounds while playing
+- [ ] Hear sounds while playing
 
--[ ] Interact with the game by dragging the line to reach the goal status
+- [ ] Interact with the game by dragging the line to reach the goal status
 
 ## Architecture and Technologies
 
@@ -33,30 +32,30 @@
 
 **Day 1:**
 
--[ ] Complete basic page skeleton and functionality
+- [ ] Complete basic page skeleton and functionality
 
--[ ] Complete board design and rendering
+- [ ] Complete board design and rendering
 
 **Day 2:**
 
--[ ] Implement main game logic
+- [ ] Implement main game logic
 
 **Day 3:**
 
--[ ] Finish main game logic
+- [ ] Finish main game logic
 
 **Day 4:**
 
--[ ] Add flashy visuals
+- [ ] Add flashy visuals
 
--[ ] Finish styling page
+- [ ] Finish styling page
 
--[ ] Complete MVPs an iron out project
+- [ ] Complete MVPs an iron out project
 
 **Weekend (Day 5 & 6):**
 
--[ ] Bonus feature - timer
+- [ ] Bonus feature - timer
 
--[ ] Bonus feature - hints
+- [ ] Bonus feature - hints
 
--[ ] Bonus feature - scoreboard
+- [ ] Bonus feature - scoreboard
