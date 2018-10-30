@@ -28,6 +28,10 @@
 - `board.js` responsible for rendering the board
 - `player.js` receives input and outputs reaction
 
+**Wireframe**
+
+![](readme_img/wireframe.jpg)
+
 ## Implementation Timeline
 
 **Day 1:**
