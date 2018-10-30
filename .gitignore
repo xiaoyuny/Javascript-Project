@@ -12,3 +12,6 @@ bower_components/
 ## Files
 result.xml
 npm-debug.log
+
+*/bundle.js
+*/bundle.js.map
