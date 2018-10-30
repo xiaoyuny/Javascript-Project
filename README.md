@@ -36,7 +36,7 @@
 
 **Day 1:**
 
-- [ ] Complete basic page skeleton and functionality
+- [ ] Complete basic page skeleton
 
 - [ ] Complete board design and rendering
 
@@ -46,7 +46,7 @@
 
 **Day 3:**
 
-- [ ] Finish main game logic
+- [ ] Design and populate levels
 
 **Day 4:**
 
@@ -58,8 +58,12 @@
 
 **Weekend (Day 5 & 6):**
 
-- [ ] Bonus feature - timer
+- [ ] Test, debug, polish and deploy
 
-- [ ] Bonus feature - hints
+**Bonus Features**
 
-- [ ] Bonus feature - scoreboard
+- [ ] Hints
+
+- [ ] Timer
+
+- [ ] Scoreboard
