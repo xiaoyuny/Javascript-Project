@@ -1,5 +1,4 @@
 ## System and generated files
-.idea
 .DS_Store
 .sass-cache
 
@@ -10,8 +9,5 @@ node_modules/
 bower_components/
 
 ## Files
-result.xml
-npm-debug.log
-
 */bundle.js
 */bundle.js.map
