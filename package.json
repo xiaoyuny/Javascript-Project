@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/xiaoyuny/Line-Weaver/issues"
   },
-  "homepage": "https://github.com/xiaoyuny/Line-Weaver#readme"
+  "homepage": "https://github.com/xiaoyuny/Line-Weaver#readme",
+  "dependencies": {
+    "webpack-cli": "^3.1.2",
+    "wepack": "0.0.1"
+  }
 }
