@@ -10,8 +10,6 @@
 
 - [ ] View board and goals
 
-- [ ] Hear sounds while playing
-
 - [ ] Interact with the game by dragging the line to reach the goal status
 
 ## Architecture and Technologies
