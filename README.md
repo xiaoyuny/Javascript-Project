@@ -36,21 +36,23 @@
 
 **Day 1:**
 
-- [ ] Complete basic page skeleton
+- [x] Complete basic page skeleton
 
-- [ ] Complete board design and rendering
+- [x] Complete board design and rendering
 
 **Day 2:**
 
-- [ ] Draw different types of vertex
+- [x] Draw different types of vertex
 
-- [ ] Attach event listeners
+- [x] Attach event listeners
 
-- [ ] Implement edge-clicking related logic
+- [x] Implement edge-clicking related logic
 
 **Day 3:**
 
-- [ ] Continue working on game logic
+- [ ] Implement detect nearby vertex and attach edges related logic
+
+- [ ] Implement edges conflict related logic
 
 **Day 4:**
 
