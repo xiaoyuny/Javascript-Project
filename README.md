@@ -42,21 +42,27 @@
 
 **Day 2:**
 
-- [ ] Implement main game logic
+- [ ] Draw different types of vertex
+
+- [ ] Attach event listeners
+
+- [ ] Implement edge-clicking related logic
 
 **Day 3:**
 
-- [ ] Design and populate levels
+- [ ] Continue working on game logic
 
 **Day 4:**
 
-- [ ] Add flashy visuals
+- [ ] Finish main game logic
 
-- [ ] Finish styling page
+- [ ] Implement levels, Write AI logic to populate levels
+
+**Weekend (Day 5 & 6):**
 
 - [ ] Complete MVPs an iron out project
 
-**Weekend (Day 5 & 6):**
+- [ ] Style page
 
 - [ ] Test, debug, polish and deploy
 
@@ -64,6 +70,6 @@
 
 - [ ] Hints
 
-- [ ] Timer
+- [ ] Audio
 
 - [ ] Scoreboard
