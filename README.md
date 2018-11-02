@@ -4,7 +4,7 @@
 
 ## Background and Overview
 
-`Line Weaver` is a mathematical brain teaser that challenges the player to weave a single line into wonderful patterns. It is built entirely in JavaScript and utilizes Canvas to interact with the player.
+`Line Weaver` is a mathematical brain teaser that challenges the player to weave a single line into wonderful patterns. It is built entirely in `JavaScript` and utilizes `Canvas` to interact with the player.
 
 ## Functionality and MVP Features
 
