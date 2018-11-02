@@ -4,7 +4,7 @@
 
 ## Background and Overview
 
-`Line Weaver` is a simple and easy game to pick up quickly. A few lines can weave countless wonderful patterns! Drag any line to a point, and divide it into two new lines; the new lines can also be divided.
+`Line Weaver` is a mathematical brain teaser that challenges the player to weave a single line into wonderful patterns. It is built entirely in JavaScript and utilizes Canvas to interact with the player.
 
 ## Functionality and MVP Features
 
