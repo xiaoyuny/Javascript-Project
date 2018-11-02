@@ -65,10 +65,22 @@ ul li {
   height: 60px;
   background-color: rgb(248, 145, 164);
   border-radius: 5px;
+  /* box-shadow: 3px 3px 10px rgb(155, 155, 155); */
+  box-shadow: 0 6px rgb(168, 87, 100);
+}
+
+ul li:hover {
+  background-color: rgb(250, 98, 126);
+}
+
+ul li:active {
+  /* background-color: #3e8e41; */
+  box-shadow: 0 2px rgb(128, 65, 75);
+  transform: translateY(4px);
 }
 
 i {
-  font-size: 45px;
+  font-size: 40px;
   margin-top: 10px;
   color: white;
 }
