@@ -48,21 +48,21 @@
 
 **Day 3:**
 
-- [ ] Implement detect nearby vertex and attach edges related logic
+- [x] Implement detect nearby vertex and attach edges related logic
 
-- [ ] Implement edges conflict related logic
+- [x] Implement edges conflict related logic
 
 **Day 4:**
 
-- [ ] Finish main game logic
+- [x] Finish off main game logic
 
-- [ ] Implement levels, Write AI logic to populate levels
+- [x] Implement levels, Write AI logic to populate levels
+
+- [x] Style page
 
 **Weekend (Day 5 & 6):**
 
 - [ ] Complete MVPs an iron out project
-
-- [ ] Style page
 
 - [ ] Test, debug, polish and deploy
 
@@ -71,5 +71,3 @@
 - [ ] Hints
 
 - [ ] Audio
-
-- [ ] Scoreboard
