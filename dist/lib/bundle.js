@@ -195,6 +195,7 @@ class Game {
     this.gameView = gameView;
     this.level = 0;
     this.enableUndoLastMove();
+    this.enableRestart();
   }
 
   levelCleared() {}
@@ -208,7 +209,7 @@ class Game {
 
   enableRestart() {
     const restart = document.getElementById('restart');
-    undo.addEventListener('click', this.handleRestart.bind(this));
+    restart.addEventListener('click', this.handleRestart.bind(this));
   }
 
   handleUndo() {
@@ -230,7 +231,12 @@ class Game {
     }
   }
 
-  handleRestart() {}
+  handleRestart() {
+    this.gameView.fullVertex = this.gameView.initializeStartingVertex();
+    this.gameView.ctx.clearRect(0, 0, 450, 450);
+    this.gameView.drawVertex();
+    this.gameView.drawlines();
+  }
 }
 
 module.exports = Game;
