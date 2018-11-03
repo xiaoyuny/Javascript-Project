@@ -82,3 +82,14 @@ i {
   margin-top: 10px;
   color: white;
 }
+
+#message {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  font-size: 50px;
+  font-family: 'Poor Story', cursive;
+  color: black;
+  padding: 10px 10px 50px 10px;
+  height: 100px;
+}

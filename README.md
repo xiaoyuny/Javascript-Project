@@ -63,3 +63,5 @@
 - Hints
 
 - Audio
+
+- Mobile-friendly version
