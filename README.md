@@ -1,6 +1,6 @@
 # Line Weaver
 
-## <img src="assets/images/icon.png" alt="drawing" style="width:15px;"/> [Live Link](https://xiaoyuny.github.io/Line-Weaver/) <img src="assets/images/icon.png" alt="drawing" style="width:15px;"/>
+### <img src="assets/images/icon.png" width="16px" >...[Live Link](https://xiaoyuny.github.io/Line-Weaver/)...<img src="assets/images/icon.png" width="16px" >
 
 ## Background and Overview
 
