@@ -1,6 +1,6 @@
 # Line Weaver
 
-[Live Link](https://github.com/xiaoyuny/javascript-project)
+### <img src="assets/images/icon.png" width="16px" >...[Live Link](https://xiaoyuny.github.io/Line-Weaver/)...<img src="assets/images/icon.png" width="16px" >
 
 ## Background and Overview
 
@@ -8,23 +8,15 @@
 
 ## Functionality and MVP Features
 
-- [ ] View board and goals
+- Users can view board and patterns
 
-- [ ] Interact with the game by dragging the line to reach the goal status
+- Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
 
 ## Architecture and Technologies
 
 - Vanilla `JavaScript` for overall structure and game logic
 - `HTML5 Canvas` for DOM manipulation and rendering
-- `Web Audio API` for sound generation, processing and control
 - `Webpack` to bundle and serve up the various scripts
-- `React.js` for basic page structure and functionality
-
-**Main files**
-
-- `game.js` main structure of the canvas and center of game logic
-- `board.js` responsible for rendering the board
-- `player.js` receives input and outputs reaction
 
 **Wireframe**
 
@@ -66,8 +58,8 @@
 
 - [ ] Test, debug, polish and deploy
 
-**Bonus Features**
+**Future Bonus Features**
 
-- [ ] Hints
+- Hints
 
-- [ ] Audio
+- Audio
