@@ -268,10 +268,10 @@ class GameView {
     for (let i = 0; i < this.allVertexPos.length; i++) {
       let pos = this.allVertexPos[i];
       if (
-        pos[0] <= e.offsetX + 30 &&
-        pos[0] >= e.offsetX - 30 &&
-        pos[1] <= e.offsetY + 30 &&
-        pos[1] >= e.offsetY - 30
+        pos[0] <= e.offsetX + 20 &&
+        pos[0] >= e.offsetX - 20 &&
+        pos[1] <= e.offsetY + 20 &&
+        pos[1] >= e.offsetY - 20
       ) {
         const newVertex = new VertexFull({
           x: pos[0],
@@ -553,8 +553,8 @@ class GameView {
 
   populateVertex() {
     const result = [];
-    for (let x = 50; x <= 500; x += 100) {
-      for (let y = 50; y <= 500; y += 100) {
+    for (let x = 45; x <= 450; x += 90) {
+      for (let y = 45; y <= 450; y += 90) {
         result.push([x, y]);
       }
     }
