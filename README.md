@@ -16,7 +16,6 @@
 
 - Vanilla `JavaScript` for overall structure and game logic
 - `HTML5 Canvas` for DOM manipulation and rendering
-- `Web Audio API` for sound generation, processing and control
 - `Webpack` to bundle and serve up the various scripts
 - `React.js` for basic page structure and functionality
 

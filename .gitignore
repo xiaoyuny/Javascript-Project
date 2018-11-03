@@ -1,13 +1,3 @@
-## System and generated files
+
 .DS_Store
-.sass-cache
-
-## Directories
-log/
-dist/
 node_modules/
-bower_components/
-
-## Files
-*/bundle.js
-*/bundle.js.map
