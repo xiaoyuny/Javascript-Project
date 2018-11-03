@@ -262,7 +262,7 @@ class GameView {
   constructor(ctx) {
     this.ctx = ctx;
     this.stage = 1;
-    this.startingVertexPos = Stats.game[1];
+    this.startingVertexPos = this.calculateStartPos();
     this.fullVertex = this.initializeStartingVertex();
     this.allVertexPos = this.populateVertex();
     this.moveOrder = [];
@@ -596,6 +596,10 @@ class GameView {
     }
     return result;
   }
+
+  calculateStartPos() {
+    return Stats.game[this.stage].map(el => el.map(num => 45 + num * 90));
+  }
 }
 
 module.exports = GameView;
@@ -619,10 +623,6 @@ class Level {
     this.final = Stats.final[this.stage];
 
     this.drawFinal();
-
-    document
-      .getElementById('level-canvas')
-      .addEventListener('click', e => console.log(e.offsetX, e.offsetY));
   }
 
   drawFinal() {
@@ -630,7 +630,7 @@ class Level {
     for (let i = 0; i < this.final.length - 1; i++) {
       const vertexPos1 = this.final[i];
       const vertexPos2 = this.final[i + 1];
-      this.drawEdge(vertexPos1, vertexPos2);
+      this.drawEdge([vertexPos1, vertexPos2]);
     }
   }
 
@@ -638,30 +638,30 @@ class Level {
     const width = 216;
     const height = 216;
     this.ctx.lineWidth = 3.5;
-    const p = 15;
 
     for (let x = 30; x <= width; x += 42) {
       for (let y = 30; y <= height; y += 42) {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'lightgrey';
         this.ctx.fillStyle = 'lightgrey';
-        this.ctx.arc(x, y, 8, 0, 2 * Math.PI);
+        this.ctx.arc(x, y, 6, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
       }
     }
   }
 
-  drawEdge(vertexPos1, vertexPos2) {
-    console.log('drawing');
+  drawEdge(vertexes) {
+    vertexes = vertexes.map(el => el.map(num => 30 + num * 42));
+
     this.ctx.strokeStyle = 'pink';
     this.ctx.shadowColor = 'pink';
     this.ctx.lineWidth = 9;
     this.ctx.shadowBlur = 10;
     this.ctx.globalAlpha = 0.5;
     this.ctx.beginPath();
-    this.ctx.moveTo(vertexPos1[0], vertexPos1[1]);
-    this.ctx.lineTo(vertexPos2[0], vertexPos2[1]);
+    this.ctx.moveTo(vertexes[0][0], vertexes[0][1]);
+    this.ctx.lineTo(vertexes[1][0], vertexes[1][1]);
     this.ctx.stroke();
   }
 }
@@ -734,10 +734,10 @@ module.exports = {
 
 module.exports = {
   game: {
-    1: [[135, 225], [315, 225]]
+    1: [[1, 2], [3, 2]]
   },
   final: {
-    1: [[72, 114], [156, 114]]
+    1: [[1, 2], [3, 2], [2, 4], [3, 3], [2, 1]]
   }
 };
 
