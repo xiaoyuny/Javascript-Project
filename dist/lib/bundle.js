@@ -640,10 +640,6 @@ class Level {
     this.final = Stats.final[this.stage];
 
     this.drawFinal();
-
-    document
-      .getElementById('level-canvas')
-      .addEventListener('click', e => console.log(e.offsetX, e.offsetY));
   }
 
   drawFinal() {
@@ -659,7 +655,6 @@ class Level {
     const width = 216;
     const height = 216;
     this.ctx.lineWidth = 3.5;
-    const p = 15;
 
     for (let x = 30; x <= width; x += 42) {
       for (let y = 30; y <= height; y += 42) {
