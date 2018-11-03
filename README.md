@@ -8,9 +8,9 @@
 
 ## Functionality and MVP Features
 
-- [ ] Users can view board and patterns
+- Users can view board and patterns
 
-- [ ] Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
+- Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
 
 ## Architecture and Technologies
 
@@ -58,8 +58,8 @@
 
 - [ ] Test, debug, polish and deploy
 
-**Bonus Features**
+**Future Bonus Features**
 
-- [ ] Hints
+- Hints
 
-- [ ] Audio
+- Audio
