@@ -1,7 +1,7 @@
 h1 {
-  font-size: 100px;
+  font-size: 90px;
   text-align: center;
-  margin: 50px 0 60px 0;
+  margin: 35px 0 45px 0;
   color: white;
   font-family: 'Poor Story', cursive;
   font-weight: 800;
@@ -31,14 +31,14 @@ body {
 #game-canvas {
   margin-left: 50px;
   border-radius: 30px;
-  border: 20px solid lightblue;
+  border: 15px solid lightblue;
   background-color: white;
   box-shadow: 7px 10px 10px rgb(155, 155, 155);
 }
 
 ul {
   list-style: none;
-  width: 245px;
+  width: 226px;
   /* height: 230px; */
   border: 10px solid lightblue;
   padding: 0;
