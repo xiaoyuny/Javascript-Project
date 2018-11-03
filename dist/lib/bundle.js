@@ -188,22 +188,52 @@ module.exports = EdgeOverlapping;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const gameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
-const Edge = __webpack_require__(/*! ./edge */ "./lib/edge.js");
+const GameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
 
 class Game {
-  constructor(options) {
-    this.level = options.level || 0;
+  constructor(gameView) {
+    this.gameView = gameView;
+    this.level = 0;
+    this.enableUndoLastMove();
   }
 
-  hasWon() {}
+  levelCleared() {}
 
   buildGraph() {}
 
-  resetCurrentLevel() {}
+  enableUndoLastMove() {
+    const undo = document.getElementById('undo');
+    undo.addEventListener('click', this.handleUndo.bind(this));
+  }
 
-  undoLastMove() {}
+  enableRestart() {
+    const restart = document.getElementById('restart');
+    undo.addEventListener('click', this.handleRestart.bind(this));
+  }
+
+  handleUndo() {
+    if (this.gameView.moveOrder.length > 0) {
+      this.gameView.fullVertex = this.gameView.fullVertex
+        .slice(
+          0,
+          this.gameView.moveOrder[this.gameView.moveOrder.length - 1] + 1
+        )
+        .concat(
+          this.gameView.fullVertex.slice(
+            this.gameView.moveOrder[this.gameView.moveOrder.length - 1] + 2
+          )
+        );
+      this.gameView.moveOrder.pop();
+      this.gameView.ctx.clearRect(0, 0, 450, 450);
+      this.gameView.drawVertex();
+      this.gameView.drawlines();
+    }
+  }
+
+  handleRestart() {}
 }
+
+module.exports = Game;
 
 
 /***/ }),
@@ -226,8 +256,9 @@ class GameView {
     this.ctx = ctx;
     this.level = 0;
     this.startingVertexPos = [[135, 225], [315, 225]];
-    this.FullVertex = this.initializeStartingVertex();
+    this.fullVertex = this.initializeStartingVertex();
     this.allVertexPos = this.populateVertex();
+    this.moveOrder = [];
     this.selected;
     this.index;
 
@@ -245,7 +276,6 @@ class GameView {
     const gameCanvas = document.getElementById('game-canvas');
 
     gameCanvas.addEventListener('mousedown', e => {
-      console.log(e.offsetX, e.offsetY);
       this.selected = this.selectedEdge(e.offsetX, e.offsetY);
 
       if (this.selected) {
@@ -279,8 +309,8 @@ class GameView {
           ctx: this.ctx
         });
 
-        const prevVertex = this.FullVertex[this.index];
-        const nextVertex = this.FullVertex[this.index + 1];
+        const prevVertex = this.fullVertex[this.index];
+        const nextVertex = this.fullVertex[this.index + 1];
 
         if (
           this.hasConflicts(prevVertex, newVertex) ||
@@ -289,10 +319,12 @@ class GameView {
         ) {
           break;
         } else {
-          this.FullVertex = this.FullVertex.slice(0, this.index + 1)
+          this.fullVertex = this.fullVertex
+            .slice(0, this.index + 1)
             .concat([newVertex])
-            .concat(this.FullVertex.slice(this.index + 1));
+            .concat(this.fullVertex.slice(this.index + 1));
 
+          this.moveOrder.push(this.index);
           break;
         }
       }
@@ -350,7 +382,7 @@ class GameView {
         vertex2: this.selected[1]
       });
     }
-    this.ctx.clearRect(0, 0, 500, 500);
+    this.ctx.clearRect(0, 0, 450, 450);
 
     this.drawVertex();
     this.drawlines();
@@ -363,11 +395,11 @@ class GameView {
 
   hasConflicts(edgeVertex1, edgeVertex2) {
     const result = [];
-    for (let i = 0; i < this.FullVertex.length; i++) {
-      if (i === this.FullVertex.length - 1) continue;
+    for (let i = 0; i < this.fullVertex.length; i++) {
+      if (i === this.fullVertex.length - 1) continue;
       if (i === this.index) continue;
-      const boardVertex1 = this.FullVertex[i];
-      const boardVertex2 = this.FullVertex[i + 1];
+      const boardVertex1 = this.fullVertex[i];
+      const boardVertex2 = this.fullVertex[i + 1];
 
       const vertex_array = [
         edgeVertex1,
@@ -461,20 +493,15 @@ class GameView {
   selectedEdge(x, y) {
     let result = {};
 
-    for (let i = 0; i < this.FullVertex.length; i++) {
-      if (i === this.FullVertex.length - 1) continue;
-      let vertex1 = this.FullVertex[i];
-      let vertex2 = this.FullVertex[i + 1];
+    for (let i = 0; i < this.fullVertex.length; i++) {
+      if (i === this.fullVertex.length - 1) continue;
+      let vertex1 = this.fullVertex[i];
+      let vertex2 = this.fullVertex[i + 1];
       // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
       let maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
       let minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
       let maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
       let minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
-
-      console.log(
-        'selectedEdge',
-        (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y)
-      );
 
       if (
         (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y) >=
@@ -490,6 +517,10 @@ class GameView {
   }
 
   // Drawing related
+
+  // redraw(target) {
+
+  // }
 
   drawVertex() {
     const width = 450;
@@ -510,13 +541,11 @@ class GameView {
   }
 
   drawlines() {
-    for (let i = 0; i < this.FullVertex.length; i++) {
-      if (i === this.FullVertex.length - 1) continue;
+    for (let i = 0; i < this.fullVertex.length; i++) {
+      if (i === this.fullVertex.length - 1) continue;
       if (i === this.index) continue;
-      let vertex1 = this.FullVertex[i];
-      let vertex2 = this.FullVertex[i + 1];
-      console.log(vertex1);
-      console.log(vertex2);
+      let vertex1 = this.fullVertex[i];
+      let vertex2 = this.fullVertex[i + 1];
 
       let edge = new Edge({
         vertex1,
@@ -529,8 +558,8 @@ class GameView {
   }
 
   isStartingVertexPos(x, y) {
-    for (let i = 0; i < this.FullVertex.length; i++) {
-      let currentVertex = this.FullVertex[i];
+    for (let i = 0; i < this.fullVertex.length; i++) {
+      let currentVertex = this.fullVertex[i];
       if (x === currentVertex.x && y === currentVertex.y) return true;
     }
     return false;
@@ -615,10 +644,9 @@ module.exports = Goal;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+const Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 const GameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
 const Goal = __webpack_require__(/*! ./goal */ "./lib/goal.js");
-
-const Game = __webpack_require__(/*! ./game */ "./lib/game.js");
 
 document.addEventListener('DOMContentLoaded', () => {
   const gameCanvas = document.getElementById('game-canvas');
@@ -634,6 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const gameView = new GameView(gameCtx);
   const goal = new Goal(goalCtx);
+  const game = new Game(gameView);
 });
 
 
