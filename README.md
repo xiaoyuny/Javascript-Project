@@ -26,9 +26,89 @@
 
 ## Implementation
 
-**On-edge-click detection && Edge crossing determination**
+![](assets/images/invalid-move.gif)
 
-![](assets/images/edge-crossing-detection.gif)
+**On-edge-click detection**
+
+<img src="assets/images/corss-product.jpg" height="200px" >
+
+| **_a_** × **_b_** | = 0 <=> the area formed by edge `a` and `b` is 0 <=> edge `a` and edge `b` are on the same line <=> vertex `A`, `O`, `B` are on the same line.
+
+In the game, edges have thickness, therefore the corss product can fall in a range instead of being a single value, and vertex `O` also needs to be between `A` and `B`.
+
+```Javascript
+  selectedEdge(x, y) {
+    for (let i = 0; i < this.fullVertex.length; i++) {
+      if (i === this.fullVertex.length - 1) continue;
+      const vertex1 = this.fullVertex[i];
+      const vertex2 = this.fullVertex[i + 1];
+
+      const maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
+      const minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
+      const maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
+      const minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
+
+      if (
+        (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y) >=
+          -2000 &&
+        (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y) <=
+          2000 &&
+        ((x < maxX && x > minX) || (y < maxY && y > minY))
+      ) {
+        this.index = i;
+        return [vertex1, vertex2];
+      }
+    }
+  }
+```
+
+**Edge crossing determination**
+
+In the following image,
+Edge `a` - formed by vertex `A` and `B`,
+Edge `b` - formed by vertex `C` and `D`.
+
+If `a` and `b` will not cross, following the order `A` -> `C` -> `B` -> `D`, will form a convex quadrilateral,
+on the contratry, if `a` and `b` will cross, this action will form a crossed quadrilateral.
+
+This is the basic concept of how `Line Weaver` checks edge conflicts.
+
+<img src="assets/images/cp-1.jpg" height="300px" > <img src="assets/images/cp-2.jpg" height="300px" >
+
+```Javascript
+  hasConflicts(edgeVertex1, edgeVertex2) {
+    const result = [];
+    for (let i = 0; i < this.fullVertex.length - 1; i++) {
+      if (i === this.index) continue;
+      const boardVertex1 = this.fullVertex[i];
+      const boardVertex2 = this.fullVertex[i + 1];
+
+      const vertexArray = [
+        edgeVertex1,
+        boardVertex1,
+        edgeVertex2,
+        boardVertex2
+      ];
+      const crossProduct = [];
+
+      for (let i = 0; i < 4; i++) {
+        const vertex1 = vertexArray[i];
+        const vertex2 = vertexArray[(i + 1) % 4];
+        const vertex3 = vertexArray[(i + 2) % 4];
+
+        crossProduct.push(
+          (vertex3.x - vertex1.x) * (vertex3.y - vertex2.y) -
+            (vertex3.x - vertex2.x) * (vertex3.y - vertex1.y)
+        );
+      }
+
+      if (
+        crossProduct.every(value => value > 0) ||
+        crossProduct.every(value => value < 0) {
+          result.push(true);
+        } else if (...) {
+        ......
+```
 
 **Level clear determination**
 

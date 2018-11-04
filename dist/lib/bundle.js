@@ -215,24 +215,6 @@ class Game {
   }
 
   levelCleared() {
-    const player = this.gameView.fullVertex
-      .map(el => [el.x, el.y])
-      .map(el => el.map(num => (num - 45) / 90));
-
-    if (player.length !== this.level.goal.length) return false;
-    for (let i = 0; i < player.length; i++) {
-      if (
-        player[i][0] !== this.level.goal[i][0] ||
-        player[i][1] !== this.level.goal[i][1]
-      ) {
-        return;
-      }
-    }
-
-    this.renderModal();
-  }
-
-  levelCleared2() {
     const playerEdges = [];
     for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
       const startVertex = this.gameView.fullVertex[i];
@@ -399,7 +381,7 @@ class Game {
   enableCheckWinning() {
     const gameCanvas = document.getElementById('game-canvas');
     gameCanvas.addEventListener('mouseup', e =>
-      setTimeout(this.levelCleared2.bind(this), 250)
+      setTimeout(this.levelCleared.bind(this), 250)
     );
   }
 
@@ -593,8 +575,7 @@ class GameView {
 
   hasConflicts(edgeVertex1, edgeVertex2) {
     const result = [];
-    for (let i = 0; i < this.fullVertex.length; i++) {
-      if (i === this.fullVertex.length - 1) continue;
+    for (let i = 0; i < this.fullVertex.length - 1; i++) {
       if (i === this.index) continue;
       const boardVertex1 = this.fullVertex[i];
       const boardVertex2 = this.fullVertex[i + 1];
@@ -605,25 +586,25 @@ class GameView {
         edgeVertex2,
         boardVertex2
       ];
-      const convolution = [];
+      const crossProduct = [];
 
       for (let i = 0; i < 4; i++) {
         const vertex1 = vertexArray[i];
         const vertex2 = vertexArray[(i + 1) % 4];
         const vertex3 = vertexArray[(i + 2) % 4];
 
-        convolution.push(
+        crossProduct.push(
           (vertex3.x - vertex1.x) * (vertex3.y - vertex2.y) -
             (vertex3.x - vertex2.x) * (vertex3.y - vertex1.y)
         );
       }
 
       if (
-        convolution.every(value => value > 0) ||
-        convolution.every(value => value < 0)
+        crossProduct.every(value => value > 0) ||
+        crossProduct.every(value => value < 0)
       ) {
         result.push(true);
-      } else if (convolution.every(value => value === 0)) {
+      } else if (crossProduct.every(value => value === 0)) {
         return (
           this.isSameEdge(
             edgeVertex1,
