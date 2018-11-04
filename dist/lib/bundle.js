@@ -234,14 +234,14 @@ class Game {
   levelCleared2() {
     const playerEdges = [];
     for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
-      let startVertex = this.gameView.fullVertex[i];
-      let endVertex = this.gameView.fullVertex[i + 1];
-      let x0 = (startVertex.x - 45) / 90;
-      let y0 = (startVertex.y - 45) / 90;
-      let x1 = (endVertex.x - 45) / 90;
-      let y1 = (endVertex.y - 45) / 90;
-      let dx = x1 - x0;
-      let dy = y1 - y0;
+      const startVertex = this.gameView.fullVertex[i];
+      const endVertex = this.gameView.fullVertex[i + 1];
+      const x0 = (startVertex.x - 45) / 90;
+      const y0 = (startVertex.y - 45) / 90;
+      const x1 = (endVertex.x - 45) / 90;
+      const y1 = (endVertex.y - 45) / 90;
+      const dx = x1 - x0;
+      const dy = y1 - y0;
       for (let j = 4; j >= 1; j--) {
         if (dx % j == 0 && dy % j == 0) {
           for (let k = 0; k < j; k++) {
@@ -264,12 +264,12 @@ class Game {
     }
     const computerEdges = [];
     for (let i = 0; i < this.level.goal.length; i++) {
-      let x0 = this.level.goal[i][0][0];
-      let y0 = this.level.goal[i][0][1];
-      let x1 = this.level.goal[i][1][0];
-      let y1 = this.level.goal[i][1][1];
-      let dx = x1 - x0;
-      let dy = y1 - y0;
+      const x0 = this.level.goal[i][0][0];
+      const y0 = this.level.goal[i][0][1];
+      const x1 = this.level.goal[i][1][0];
+      const y1 = this.level.goal[i][1][1];
+      const dx = x1 - x0;
+      const dy = y1 - y0;
       for (let j = 4; j >= 1; j--) {
         if (dx % j == 0 && dy % j == 0) {
           for (let k = 0; k < j; k++) {
