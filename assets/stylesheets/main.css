@@ -36,7 +36,7 @@ body {
   box-shadow: 7px 10px 10px rgb(155, 155, 155);
 }
 
-ul {
+.buttons {
   list-style: none;
   width: 226px;
   border: 10px solid lightblue;
@@ -58,7 +58,7 @@ ul {
   margin-bottom: 15px;
 }
 
-ul li {
+.buttons li {
   cursor: pointer;
   margin: 20px 0 10px 0;
   width: 50px;
@@ -68,11 +68,11 @@ ul li {
   box-shadow: 0 6px rgb(168, 87, 100);
 }
 
-ul li:hover {
+.buttons li:hover {
   background-color: rgb(250, 98, 126);
 }
 
-ul li:active {
+.buttons li:active {
   box-shadow: 0 2px rgb(128, 65, 75);
   transform: translateY(4px);
 }
@@ -84,12 +84,49 @@ i {
 }
 
 #message {
+  width: 500px;
+  height: 500px;
+  list-style: none;
   position: absolute;
-  top: 25%;
-  left: 50%;
+  top: 180px;
+  left: 40%;
   font-size: 50px;
   font-family: 'Poor Story', cursive;
   color: black;
-  padding: 10px 10px 50px 10px;
-  height: 100px;
+  background-color: rgba(195, 238, 255, 0.918);
+  border: 3px solid white;
+  border-radius: 30px;
+  padding: 100px;
+  box-sizing: border-box;
+  margin: 0;
+  box-shadow: 7px 10px 10px rgb(155, 155, 155);
+}
+
+.display-none {
+  display: none;
+}
+
+#message li:first-child {
+  text-shadow: 5px 5px 10px grey;
+}
+
+#message li:last-child {
+  font-size: 30px;
+  width: 70px;
+  text-align: center;
+  cursor: pointer;
+  background-color: rgb(248, 145, 164);
+  border-radius: 5px;
+  box-shadow: 0 6px rgb(168, 87, 100);
+  padding: 10px 30px 10px 30px;
+  margin: 70px 0 0 85px;
+}
+
+#message li:hover {
+  background-color: rgb(250, 98, 126);
+}
+
+#message li:active {
+  box-shadow: 0 2px rgb(128, 65, 75);
+  transform: translateY(4px);
 }

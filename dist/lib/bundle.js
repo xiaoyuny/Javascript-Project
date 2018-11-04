@@ -217,15 +217,36 @@ class Game {
       }
     }
 
-    const para = document.createElement('p');
-    const node = document.createTextNode('LEVEL CLEARED');
-    para.appendChild(node);
-
-    const el = document.getElementById('message');
-    el.appendChild(para);
+    this.renderModal();
 
     console.log('cleared');
     return true;
+  }
+
+  renderModal() {
+    const messageUl = document.getElementById('message');
+    messageUl.className = '';
+    const li1 = document.createElement('li');
+    const li2 = document.createElement('li');
+    li1.appendChild(document.createTextNode(`Level ${this.stage} cleared!`));
+    li2.appendChild(document.createTextNode('NEXT'));
+    messageUl.appendChild(li1);
+    messageUl.appendChild(li2);
+    li2.addEventListener('click', e => {
+      this.handleStageClear();
+      setTimeout(() => {
+        messageUl.className = 'display-none';
+        messageUl.removeChild(li1);
+        messageUl.removeChild(li2);
+      }, 200);
+    });
+  }
+
+  handleStageClear() {
+    this.stage += 1;
+    this.gameView.ctx.clearRect(0, 0, 450, 450);
+    this.level.ctx.clearRect(0, 0, 216, 216);
+    this.buildGraph();
   }
 
   buildGraph() {
@@ -769,10 +790,12 @@ module.exports = {
 
 module.exports = {
   game: {
-    1: [[1, 2], [3, 2]]
+    1: [[1, 2], [3, 2]],
+    2: [[2, 2], [4, 2]]
   },
   goal: {
-    1: [[1, 2], [2, 1], [3, 2]]
+    1: [[1, 2], [2, 1], [3, 2]],
+    2: [[2, 2], [2, 3], [4, 2]]
   }
 };
 
