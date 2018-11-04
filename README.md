@@ -22,8 +22,7 @@
 
 `Line Weaver` uses simple and easy to understand UI design with delightful colors.
 
-<img src="assets/images/UI.jpg" height="400px" >
-<img src="assets/images/level-clear.jpg" height="400px" >
+<img src="assets/images/UI.jpg" height="360px" > <img src="assets/images/level-clear.jpg" height="360px" >
 
 ## Implementation
 
