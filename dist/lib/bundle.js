@@ -189,18 +189,49 @@ module.exports = EdgeOverlapping;
 /***/ (function(module, exports, __webpack_require__) {
 
 const GameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
+const Level = __webpack_require__(/*! ./level */ "./lib/level.js");
 
 class Game {
-  constructor(gameView) {
-    this.gameView = gameView;
-    this.level = 0;
+  constructor(gameCtx, levelCtx) {
+    this.stage = 1;
+    this.gameCtx = gameCtx;
+    this.levelCtx = levelCtx;
+    this.buildGraph();
     this.enableUndoLastMove();
     this.enableRestart();
+    this.enableCheckWinning();
   }
 
-  levelCleared() {}
+  levelCleared() {
+    const player = this.gameView.fullVertex
+      .map(el => [el.x, el.y])
+      .map(el => el.map(num => (num - 45) / 90));
 
-  buildGraph() {}
+    if (player.length !== this.level.goal.length) return false;
+    for (let i = 0; i < player.length; i++) {
+      if (
+        player[i][0] !== this.level.goal[i][0] ||
+        player[i][1] !== this.level.goal[i][1]
+      ) {
+        return false;
+      }
+    }
+
+    const para = document.createElement('p');
+    const node = document.createTextNode('LEVEL CLEARED');
+    para.appendChild(node);
+
+    const el = document.getElementById('message');
+    el.appendChild(para);
+
+    console.log('cleared');
+    return true;
+  }
+
+  buildGraph() {
+    this.gameView = new GameView(this.gameCtx, this.stage);
+    this.level = new Level(this.levelCtx, this.stage);
+  }
 
   enableUndoLastMove() {
     const undo = document.getElementById('undo');
@@ -210,6 +241,13 @@ class Game {
   enableRestart() {
     const restart = document.getElementById('restart');
     restart.addEventListener('click', this.handleRestart.bind(this));
+  }
+
+  enableCheckWinning() {
+    const gameCanvas = document.getElementById('game-canvas');
+    gameCanvas.addEventListener('mouseup', e =>
+      setTimeout(this.levelCleared.bind(this), 250)
+    );
   }
 
   handleUndo() {
@@ -259,10 +297,10 @@ const EdgeOverlapping = __webpack_require__(/*! ./edge_overlapping */ "./lib/edg
 const Stats = __webpack_require__(/*! ./util/stats */ "./lib/util/stats.js");
 
 class GameView {
-  constructor(ctx) {
+  constructor(ctx, stage) {
     this.ctx = ctx;
-    this.stage = 1;
-    this.startingVertexPos = Stats.game[1];
+    this.stage = stage;
+    this.startingVertexPos = this.calculateStartPos();
     this.fullVertex = this.initializeStartingVertex();
     this.allVertexPos = this.populateVertex();
     this.moveOrder = [];
@@ -415,7 +453,7 @@ class GameView {
       const boardVertex1 = this.fullVertex[i];
       const boardVertex2 = this.fullVertex[i + 1];
 
-      const vertex_array = [
+      const vertexArray = [
         edgeVertex1,
         boardVertex1,
         edgeVertex2,
@@ -424,9 +462,9 @@ class GameView {
       const convolution = [];
 
       for (let i = 0; i < 4; i++) {
-        const vertex1 = vertex_array[i];
-        const vertex2 = vertex_array[(i + 1) % 4];
-        const vertex3 = vertex_array[(i + 2) % 4];
+        const vertex1 = vertexArray[i];
+        const vertex2 = vertexArray[(i + 1) % 4];
+        const vertex3 = vertexArray[(i + 2) % 4];
 
         convolution.push(
           (vertex3.x - vertex1.x) * (vertex3.y - vertex2.y) -
@@ -440,35 +478,18 @@ class GameView {
       ) {
         result.push(true);
       } else if (convolution.every(value => value === 0)) {
-        for (let i = 0; i < 4; i++) {
-          const vertex1 = vertex_array[i];
-          const vertex2 = vertex_array[(i + 1) % 4];
-          const vertex3 = vertex_array[(i + 2) % 4];
-
-          // let maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
-          // let minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
-          // let maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
-          // let minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
-
-          if (
-            (vertex3.x - vertex1.x) * (vertex3.y - vertex2.y) -
-              (vertex3.x - vertex2.x) * (vertex3.y - vertex1.y) ===
-            0
-          ) {
-            if (
-              this.isVertexOnEdge(edgeVertex1, edgeVertex2, boardVertex1) ||
-              this.isVertexOnEdge(edgeVertex1, edgeVertex2, boardVertex2) ||
-              this.isVertexOnEdge(boardVertex1, boardVertex2, edgeVertex1) ||
-              this.isVertexOnEdge(boardVertex1, boardVertex2, edgeVertex2)
-            ) {
-              result.push(false);
-              break;
-            } else {
-              result.push(true);
-              break;
-            }
-          }
-        }
+        return (
+          this.isSameEdge(
+            edgeVertex1,
+            edgeVertex2,
+            boardVertex1,
+            boardVertex2
+          ) ||
+          (this.isVertexOnEdge(edgeVertex1, edgeVertex2, boardVertex1) ||
+            this.isVertexOnEdge(edgeVertex1, edgeVertex2, boardVertex2) ||
+            this.isVertexOnEdge(boardVertex1, boardVertex2, edgeVertex1) ||
+            this.isVertexOnEdge(boardVertex1, boardVertex2, edgeVertex2))
+        );
       } else {
         result.push(false);
       }
@@ -489,6 +510,27 @@ class GameView {
     );
 
     return isEdgeConflicting1 || isEdgeConflicting2;
+  }
+
+  isSameEdge(edgeVertex1, edgeVertex2, boardVertex1, boardVertex2) {
+    if (
+      this.samePos(edgeVertex1, boardVertex1) &&
+      this.samePos(edgeVertex2, boardVertex2)
+    ) {
+      return true;
+    }
+
+    if (
+      this.samePos(edgeVertex1, boardVertex2) &&
+      this.samePos(edgeVertex2, boardVertex1)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  samePos(vertex1, vertex2) {
+    return vertex1.x === vertex2.x && vertex1.y === vertex2.y;
   }
 
   isVertexOnEdge(edgeVertex1, edgeVertex2, vertex) {
@@ -543,12 +585,6 @@ class GameView {
       }
     }
   }
-
-  // Drawing related
-
-  // redraw(target) {
-
-  // }
 
   drawVertex() {
     const width = 450;
@@ -617,6 +653,10 @@ class GameView {
     }
     return result;
   }
+
+  calculateStartPos() {
+    return Stats.game[this.stage].map(el => el.map(num => 45 + num * 90));
+  }
 }
 
 module.exports = GameView;
@@ -632,22 +672,23 @@ module.exports = GameView;
 /***/ (function(module, exports, __webpack_require__) {
 
 const Stats = __webpack_require__(/*! ./util/stats */ "./lib/util/stats.js");
+const Constants = __webpack_require__(/*! ./util/constants */ "./lib/util/constants.js");
 
 class Level {
-  constructor(ctx) {
+  constructor(ctx, stage) {
     this.ctx = ctx;
-    this.stage = 1;
-    this.final = Stats.final[this.stage];
+    this.stage = stage;
+    this.goal = Stats.goal[this.stage];
 
     this.drawFinal();
   }
 
   drawFinal() {
     this.drawVertex();
-    for (let i = 0; i < this.final.length - 1; i++) {
-      const vertexPos1 = this.final[i];
-      const vertexPos2 = this.final[i + 1];
-      this.drawEdge(vertexPos1, vertexPos2);
+    for (let i = 0; i < this.goal.length - 1; i++) {
+      const vertexPos1 = this.goal[i];
+      const vertexPos2 = this.goal[i + 1];
+      this.drawEdge([vertexPos1, vertexPos2]);
     }
   }
 
@@ -661,23 +702,24 @@ class Level {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'lightgrey';
         this.ctx.fillStyle = 'lightgrey';
-        this.ctx.arc(x, y, 8, 0, 2 * Math.PI);
+        this.ctx.arc(x, y, 6, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
       }
     }
   }
 
-  drawEdge(vertexPos1, vertexPos2) {
-    console.log('drawing');
-    this.ctx.strokeStyle = 'pink';
-    this.ctx.shadowColor = 'pink';
+  drawEdge(vertexes) {
+    vertexes = vertexes.map(el => el.map(num => 30 + num * 42));
+
+    this.ctx.strokeStyle = Constants.VERTEX_PINK;
+    this.ctx.shadowColor = Constants.VERTEX_PINK;
     this.ctx.lineWidth = 9;
     this.ctx.shadowBlur = 10;
-    this.ctx.globalAlpha = 0.5;
+    this.ctx.globalAlpha = 0.4;
     this.ctx.beginPath();
-    this.ctx.moveTo(vertexPos1[0], vertexPos1[1]);
-    this.ctx.lineTo(vertexPos2[0], vertexPos2[1]);
+    this.ctx.moveTo(vertexes[0][0], vertexes[0][1]);
+    this.ctx.lineTo(vertexes[1][0], vertexes[1][1]);
     this.ctx.stroke();
   }
 }
@@ -708,11 +750,9 @@ document.addEventListener('DOMContentLoaded', () => {
   levelCanvas.height = 230;
 
   const gameCtx = gameCanvas.getContext('2d');
-  const goalCtx = levelCanvas.getContext('2d');
+  const levelCtx = levelCanvas.getContext('2d');
 
-  const gameView = new GameView(gameCtx);
-  const level = new Level(goalCtx);
-  const game = new Game(gameView);
+  const game = new Game(gameCtx, levelCtx);
 });
 
 
@@ -726,16 +766,9 @@ document.addEventListener('DOMContentLoaded', () => {
 /***/ (function(module, exports) {
 
 module.exports = {
-  // VERTEX_PINK: '#ee7f8a',
-  VERTEX_PINK: 'rgb(243, 122, 144)',
-  OVERLAPPING_EDGE_RED: 'red',
-  VALID_EDGE_YELLOW: '#e4cd00',
-  BLACK: '#000000',
-  WHITE: '#FFFFFF',
-  LINE_FREE: '#6AF794',
-  LINE_INTERSECTING: '#FF9090',
-  RADIUS: 15,
-  EPSILON: 0.00001
+  VERTEX_PINK: '#F37A90',
+  OVERLAPPING_EDGE_RED: '#FF0000',
+  VALID_EDGE_YELLOW: '#e4cd00'
 };
 
 
@@ -750,10 +783,10 @@ module.exports = {
 
 module.exports = {
   game: {
-    1: [[135, 225], [315, 225]]
+    1: [[1, 2], [3, 2]]
   },
-  final: {
-    1: [[72, 114], [156, 114]]
+  goal: {
+    1: [[1, 2], [2, 1], [3, 2]]
   }
 };
 
