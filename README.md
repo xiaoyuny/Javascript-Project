@@ -112,6 +112,74 @@ This is the basic concept of how `Line Weaver` checks edge conflicts.
 
 **Level clear determination**
 
+```Javascript
+levelCleared() {
+    let playerEdges = [];
+    for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
+      const startVertex = this.gameView.fullVertex[i];
+      const endVertex = this.gameView.fullVertex[i + 1];
+      const x0 = (startVertex.x - 45) / 90;
+      const y0 = (startVertex.y - 45) / 90;
+      const x1 = (endVertex.x - 45) / 90;
+      const y1 = (endVertex.y - 45) / 90;
+
+      playerEdges = playerEdges.concat(this.calculateEdges(x0, y0, x1, y1));
+    }
+
+    let computerEdges = [];
+    for (let i = 0; i < this.level.goal.length; i++) {
+      const x0 = this.level.goal[i][0][0];
+      const y0 = this.level.goal[i][0][1];
+      const x1 = this.level.goal[i][1][0];
+      const y1 = this.level.goal[i][1][1];
+
+      computerEdges = computerEdges.concat(this.calculateEdges(x0, y0, x1, y1));
+    }
+
+    if (playerEdges.length != computerEdges.length) {
+      return;
+    }
+
+    for (let i = 0; i < computerEdges.length; i++) {
+      let found = playerEdges.reduce(
+        (acc, ele) => acc || ele.equalYes(computerEdges[i]),
+        false
+      );
+      if (!found) {
+        return;
+      }
+    }
+
+    this.renderModal();
+  }
+
+  calculateEdges(x0, y0, x1, y1) {
+    const result = [];
+
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    for (let j = 4; j >= 1; j--) {
+      if (dx % j == 0 && dy % j == 0) {
+        for (let k = 0; k < j; k++) {
+          result.push(
+            new Edge({
+              vertex1: new Vertex({
+                x: x0 + k * (dx / j),
+                y: y0 + k * (dy / j)
+              }),
+              vertex2: new Vertex({
+                x: x0 + (k + 1) * (dx / j),
+                y: y0 + (k + 1) * (dy / j)
+              })
+            })
+          );
+        }
+        return result;
+      }
+    }
+  }
+```
+
 ## Possible future features
 
 - Hints
