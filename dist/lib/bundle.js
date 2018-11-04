@@ -218,8 +218,6 @@ class Game {
     }
 
     this.renderModal();
-
-    console.log('cleared');
     return true;
   }
 
@@ -228,22 +226,48 @@ class Game {
     messageUl.className = '';
     const li1 = document.createElement('li');
     const li2 = document.createElement('li');
-    li1.appendChild(document.createTextNode(`Level ${this.stage} cleared!`));
-    li2.appendChild(document.createTextNode('NEXT'));
-    messageUl.appendChild(li1);
-    messageUl.appendChild(li2);
-    li2.addEventListener('click', e => {
-      this.handleStageClear();
-      setTimeout(() => {
-        messageUl.className = 'display-none';
-        messageUl.removeChild(li1);
-        messageUl.removeChild(li2);
-      }, 200);
-    });
+
+    if (this.stage < 10) {
+      li1.appendChild(document.createTextNode(`Level ${this.stage} cleared!`));
+      li2.appendChild(document.createTextNode('NEXT'));
+      messageUl.appendChild(li1);
+      messageUl.appendChild(li2);
+
+      li2.addEventListener('click', e => {
+        this.handleStageClear();
+        setTimeout(() => {
+          messageUl.className = 'display-none';
+          messageUl.removeChild(li1);
+          messageUl.removeChild(li2);
+        }, 200);
+      });
+    } else {
+      li1.appendChild(
+        document.createTextNode("Congradulations! You've cleared all levels!")
+      );
+      li2.appendChild(document.createTextNode('PLAY AGAIN'));
+      messageUl.appendChild(li1);
+      messageUl.appendChild(li2);
+      li2.addEventListener('click', e => {
+        this.handleResetGame();
+        setTimeout(() => {
+          messageUl.className = 'display-none';
+          messageUl.removeChild(li1);
+          messageUl.removeChild(li2);
+        }, 200);
+      });
+    }
   }
 
   handleStageClear() {
     this.stage += 1;
+    this.gameView.ctx.clearRect(0, 0, 450, 450);
+    this.level.ctx.clearRect(0, 0, 216, 216);
+    this.buildGraph();
+  }
+
+  handleResetGame() {
+    this.stage = 1;
     this.gameView.ctx.clearRect(0, 0, 450, 450);
     this.level.ctx.clearRect(0, 0, 216, 216);
     this.buildGraph();
@@ -789,11 +813,24 @@ module.exports = {
 module.exports = {
   game: {
     1: [[1, 2], [3, 2]],
-    2: [[1, 2], [2, 1], [3, 2], [1, 2], [2, 3], [3, 2]]
+    2: [[1, 2], [2, 1], [3, 2], [1, 2], [2, 3], [3, 2]],
+    3: [[2, 2], [1, 0], [3, 0], [2, 2], [1, 4], [3, 4], [2, 2]]
   },
   goal: {
-    1: [[1, 2], [2, 1], [3, 2]],
-    2: [[2, 2], [2, 3], [4, 2]]
+    1: [[1, 2], [1, 0], [2, 2], [3, 0], [3, 2]],
+    2: [[1, 2], [0, 1], [2, 1], [4, 1], [3, 2], [1, 2], [2, 3], [3, 2]],
+    3: [
+      [2, 2],
+      [0, 2],
+      [1, 0],
+      [3, 0],
+      [4, 2],
+      [2, 2],
+      [1, 4],
+      [2, 3],
+      [3, 4],
+      [2, 2]
+    ]
   }
 };
 
