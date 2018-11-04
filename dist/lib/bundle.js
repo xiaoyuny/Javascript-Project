@@ -572,12 +572,6 @@ class GameView {
     }
   }
 
-  // Drawing related
-
-  // redraw(target) {
-
-  // }
-
   drawVertex() {
     const width = 450;
     const height = 450;
