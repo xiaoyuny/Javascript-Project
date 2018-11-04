@@ -122,11 +122,11 @@ i {
   margin: 70px 0 0 85px;
 }
 
-#message li:hover {
+#message li:last-child:hover {
   background-color: rgb(250, 98, 126);
 }
 
-#message li:active {
+#message li:last-child:active {
   box-shadow: 0 2px rgb(128, 65, 75);
   transform: translateY(4px);
 }

@@ -637,18 +637,14 @@ class GameView {
   }
 
   initializeStartingVertex() {
-    const vertex1 = new VertexFull({
-      x: this.startingVertexPos[0][0],
-      y: this.startingVertexPos[0][1],
-      ctx: this.ctx
-    });
-    const vertex2 = new VertexFull({
-      x: this.startingVertexPos[1][0],
-      y: this.startingVertexPos[1][1],
-      ctx: this.ctx
-    });
-
-    return [vertex1, vertex2];
+    return this.startingVertexPos.map(
+      pos =>
+        new VertexFull({
+          x: pos[0],
+          y: pos[1],
+          ctx: this.ctx
+        })
+    );
   }
 
   populateVertex() {
@@ -709,6 +705,8 @@ class Level {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'lightgrey';
         this.ctx.fillStyle = 'lightgrey';
+        this.ctx.shadowBlur = 0;
+        this.ctx.globalAlpha = 1;
         this.ctx.arc(x, y, 6, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
@@ -791,7 +789,7 @@ module.exports = {
 module.exports = {
   game: {
     1: [[1, 2], [3, 2]],
-    2: [[2, 2], [4, 2]]
+    2: [[1, 2], [2, 1], [3, 2], [1, 2], [2, 3], [3, 2]]
   },
   goal: {
     1: [[1, 2], [2, 1], [3, 2]],
