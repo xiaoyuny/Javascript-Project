@@ -188,6 +188,8 @@ module.exports = EdgeOverlapping;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+const Edge = __webpack_require__(/*! ./edge */ "./lib/edge.js");
+const Vertex = __webpack_require__(/*! ./vertex */ "./lib/vertex.js");
 const GameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
 const Level = __webpack_require__(/*! ./level */ "./lib/level.js");
 
@@ -213,13 +215,43 @@ class Game {
         player[i][0] !== this.level.goal[i][0] ||
         player[i][1] !== this.level.goal[i][1]
       ) {
-        return false;
+        return;
       }
     }
 
     this.renderModal();
-    return true;
   }
+
+  levelCleared2() {
+    const playerEdges = [];
+    for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
+      let edge = new Edge(
+        this.gameView.fullVertex[i],
+        this.gameView.fullVertex[i + 1]
+      );
+      while (
+        i + 2 < this.gameView.fullVertex.length &&
+        this.isNextVertexOnEdge(edge, this.gameView.fullVertex[i + 2])
+      ) {
+        edge = new Edge(
+          this.gameView.fullVertex[i],
+          this.gameView.fullVertex[i + 2]
+        );
+        i++;
+      }
+
+      playerEdges.push(edge);
+    }
+
+    for (let i = playerEdges.length - 1; i >= 0; i--) {}
+  }
+
+  // helper
+  isNextVertexOnEdge(edge, vertex) {}
+
+  canEdgesCombine() {}
+
+  combineEdges() {}
 
   renderModal() {
     const messageUl = document.getElementById('message');
@@ -575,10 +607,10 @@ class GameView {
     const x = vertex.x;
     const y = vertex.y;
     // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
-    let maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
-    let minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
-    let maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
-    let minY = edgeVertex1.y < edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
+    const maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
+    const minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
+    const maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
+    const minY = edgeVertex1.y < edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
 
     return (
       (x - edgeVertex1.x) * (y - edgeVertex2.y) -
@@ -592,17 +624,16 @@ class GameView {
   }
 
   selectedEdge(x, y) {
-    let result = {};
-
     for (let i = 0; i < this.fullVertex.length; i++) {
       if (i === this.fullVertex.length - 1) continue;
-      let vertex1 = this.fullVertex[i];
-      let vertex2 = this.fullVertex[i + 1];
+      const vertex1 = this.fullVertex[i];
+      const vertex2 = this.fullVertex[i + 1];
+
       // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
-      let maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
-      let minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
-      let maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
-      let minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
+      const maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
+      const minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
+      const maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
+      const minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
 
       if (
         (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y) >=
@@ -707,14 +738,23 @@ class Level {
     this.stage = stage;
     this.goal = Stats.goal[this.stage];
 
-    this.drawFinal();
+    this.draw();
   }
 
-  drawFinal() {
+  draw2() {
     this.drawVertex();
     for (let i = 0; i < this.goal.length - 1; i++) {
       const vertexPos1 = this.goal[i];
       const vertexPos2 = this.goal[i + 1];
+      this.drawEdge([vertexPos1, vertexPos2]);
+    }
+  }
+
+  draw() {
+    this.drawVertex();
+    for (let i = 0; i < this.goal.length; i++) {
+      const vertexPos1 = this.goal[i][0];
+      const vertexPos2 = this.goal[i][1];
       this.drawEdge([vertexPos1, vertexPos2]);
     }
   }
@@ -812,24 +852,216 @@ module.exports = {
 
 module.exports = {
   game: {
-    1: [[1, 2], [3, 2]],
+    1: [[1, 3], [3, 3]],
     2: [[1, 2], [2, 1], [3, 2], [1, 2], [2, 3], [3, 2]],
-    3: [[2, 2], [1, 0], [3, 0], [2, 2], [1, 4], [3, 4], [2, 2]]
+    3: [[2, 2], [1, 0], [3, 0], [2, 2], [1, 4], [3, 4], [2, 2]],
+    4: [[1, 1], [3, 1], [3, 3], [1, 3], [1, 1]],
+    5: [[1, 1], [3, 1], [3, 3], [1, 3], [1, 1]],
+    6: [[1, 2], [1, 1], [2, 1], [2, 3], [3, 3], [3, 2]],
+    7: [[1, 1], [2, 1], [2, 2], [3, 2], [3, 3], [2, 3], [2, 2], [1, 2], [1, 1]],
+    8: [[2, 1], [1, 3], [3, 3], [2, 1]],
+    9: [[1, 2], [3, 2]],
+    10: [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]],
+    11: [[2, 1], [3, 3], [1, 3], [2, 1]],
+    12: [[1, 2], [3, 2]]
   },
   goal: {
-    1: [[1, 2], [1, 0], [2, 2], [3, 0], [3, 2]],
-    2: [[1, 2], [0, 1], [2, 1], [4, 1], [3, 2], [1, 2], [2, 3], [3, 2]],
+    1: [
+      [[1, 3], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[1, 1], [2, 3]],
+      [[2, 3], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [3, 3]]
+    ],
+    2: [
+      [[1, 2], [0, 1]],
+      [[0, 1], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 1]],
+      [[3, 1], [4, 1]],
+      [[4, 1], [3, 2]],
+      [[3, 2], [2, 3]],
+      [[2, 3], [1, 2]],
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]]
+    ],
     3: [
-      [2, 2],
-      [0, 2],
-      [1, 0],
-      [3, 0],
-      [4, 2],
-      [2, 2],
-      [1, 4],
-      [2, 3],
-      [3, 4],
-      [2, 2]
+      [[2, 2], [1, 2]],
+      [[1, 2], [0, 2]],
+      [[0, 2], [1, 0]],
+      [[1, 0], [2, 0]],
+      [[2, 0], [3, 0]],
+      [[3, 0], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [3, 4]],
+      [[3, 4], [2, 3]],
+      [[2, 3], [1, 4]],
+      [[1, 4], [2, 2]]
+    ],
+    4: [
+      [[1, 1], [1, 0]],
+      [[1, 0], [2, 0]],
+      [[2, 0], [3, 0]],
+      [[3, 0], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[2, 2], [4, 3]],
+      [[4, 3], [3, 3]],
+      [[3, 3], [3, 4]],
+      [[3, 4], [2, 4]],
+      [[2, 4], [1, 4]],
+      [[1, 4], [1, 3]],
+      [[1, 3], [0, 3]],
+      [[0, 3], [2, 2]]
+    ],
+    5: [
+      [[1, 1], [0, 2]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [2, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [4, 2]],
+      [[4, 2], [3, 1]],
+      [[3, 1], [2, 2]],
+      [[2, 2], [1, 1]]
+    ],
+    6: [
+      [[1, 2], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 2]],
+      [[3, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]]
+    ],
+    7: [
+      [[1, 1], [2, 1]],
+      [[2, 1], [2, 2]],
+      [[2, 2], [1, 1]],
+      [[2, 2], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 3]],
+      [[1, 3], [2, 2]]
+    ],
+    8: [
+      [[2, 1], [3, 1]],
+      [[3, 1], [2, 0]],
+      [[2, 0], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 3]],
+      [[3, 3], [3, 4]],
+      [[3, 4], [2, 1]],
+      [[2, 1], [1, 4]],
+      [[1, 4], [1, 3]],
+      [[1, 3], [2, 1]]
+    ],
+    9: [
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]],
+      [[2, 2], [3, 4]],
+      [[3, 4], [4, 4]],
+      [[4, 4], [3, 1]],
+      [[3, 1], [2, 1]],
+      [[2, 1], [1, 1]],
+      [[1, 1], [0, 4]],
+      [[0, 4], [1, 4]],
+      [[1, 4], [2, 2]]
+    ],
+    10: [
+      [[0, 0], [0, 4]],
+      [[0, 0], [4, 0]],
+      [[4, 0], [4, 4]],
+      [[4, 4], [0, 4]],
+      [[0, 2], [2, 2]],
+      [[2, 2], [4, 2]],
+      [[2, 2], [2, 0]],
+      [[2, 2], [2, 4]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [2, 2]],
+      [[2, 2], [1, 1]],
+      [[1, 1], [2, 0]],
+      [[2, 2], [3, 1]],
+      [[3, 1], [4, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [2, 4]]
+    ],
+    11: [
+      [[2, 0], [3, 0]],
+      [[3, 0], [3, 1]],
+      [[3, 1], [2, 1]],
+      [[2, 1], [2, 0]],
+      [[3, 1], [4, 1]],
+      [[4, 1], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[3, 2], [3, 1]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [2, 1]],
+      [[2, 1], [1, 1]],
+      [[1, 1], [1, 2]],
+      [[1, 2], [2, 2]],
+      [[3, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [2, 2]],
+      [[2, 3], [1, 3]],
+      [[1, 3], [1, 2]],
+      [[1, 3], [0, 3]],
+      [[0, 3], [0, 2]],
+      [[0, 2], [1, 2]],
+      [[1, 3], [1, 4]],
+      [[1, 4], [2, 4]],
+      [[2, 4], [2, 3]]
+    ],
+    12: [
+      [[0, 0], [1, 1]],
+      [[1, 1], [0, 1]],
+      [[0, 1], [0, 0]],
+      [[1, 1], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[1, 2], [0, 2]],
+      [[0, 2], [0, 1]],
+      [[0, 1], [1, 2]],
+      [[0, 2], [0, 3]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [0, 3]],
+      [[1, 2], [1, 3]],
+      [[1, 3], [2, 3]],
+      [[2, 3], [3, 3]],
+      [[3, 3], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [1, 3]],
+      [[2, 2], [3, 3]],
+      [[0, 3], [0, 4]],
+      [[0, 4], [1, 4]],
+      [[1, 4], [0, 3]],
+      [[1, 4], [2, 3]],
+      [[1, 3], [1, 4]],
+      [[2, 3], [3, 4]],
+      [[3, 4], [3, 3]],
+      [[3, 4], [4, 3]],
+      [[4, 4], [3, 4]],
+      [[4, 4], [4, 3]],
+      [[4, 3], [3, 3]],
+      [[4, 3], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[4, 2], [3, 3]],
+      [[4, 2], [4, 1]],
+      [[4, 1], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [4, 1]],
+      [[2, 2], [3, 1]],
+      [[4, 1], [4, 0]],
+      [[3, 1], [4, 0]]
     ]
   }
 };
