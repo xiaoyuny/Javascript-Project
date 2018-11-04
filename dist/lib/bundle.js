@@ -207,9 +207,10 @@ class Game {
     this.stage = 1;
     this.gameCtx = gameCtx;
     this.levelCtx = levelCtx;
+    this.stageClearBind = this.handleStageClear.bind(this);
     this.buildGraph();
     this.enableUndoLastMove();
-    this.enableRestart();
+    this.enableNextLevel();
     this.enableCheckWinning();
   }
 
@@ -348,6 +349,7 @@ class Game {
           messageUl.className = 'display-none';
           messageUl.removeChild(li1);
           messageUl.removeChild(li2);
+          this.enableNextLevel();
         }, 200);
       });
     }
@@ -355,6 +357,13 @@ class Game {
 
   handleStageClear() {
     this.stage += 1;
+
+    if (this.stage === 12) {
+      const nextLevel = document.getElementById('next-level');
+      nextLevel.removeEventListener('click', this.stageClearBind);
+      this.renderModal();
+    }
+
     this.gameView.ctx.clearRect(0, 0, 450, 450);
     this.level.ctx.clearRect(0, 0, 216, 216);
     this.buildGraph();
@@ -380,6 +389,11 @@ class Game {
   enableRestart() {
     const restart = document.getElementById('restart');
     restart.addEventListener('click', this.handleRestart.bind(this));
+  }
+
+  enableNextLevel() {
+    const nextLevel = document.getElementById('next-level');
+    nextLevel.addEventListener('click', this.stageClearBind);
   }
 
   enableCheckWinning() {
