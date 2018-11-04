@@ -658,31 +658,10 @@ class GameView {
     return isEdgeConflicting1 || isEdgeConflicting2;
   }
 
-  isSameEdge(edgeVertex1, edgeVertex2, boardVertex1, boardVertex2) {
-    if (
-      this.samePos(edgeVertex1, boardVertex1) &&
-      this.samePos(edgeVertex2, boardVertex2)
-    ) {
-      return true;
-    }
-
-    if (
-      this.samePos(edgeVertex1, boardVertex2) &&
-      this.samePos(edgeVertex2, boardVertex1)
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  samePos(vertex1, vertex2) {
-    return vertex1.x === vertex2.x && vertex1.y === vertex2.y;
-  }
-
   isVertexOnEdge(edgeVertex1, edgeVertex2, vertex) {
     const x = vertex.x;
     const y = vertex.y;
-    // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
+
     const maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
     const minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
     const maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
@@ -702,7 +681,7 @@ class GameView {
   isVertexExactlyOnEdge(edgeVertex1, edgeVertex2, vertex) {
     const x = vertex.x;
     const y = vertex.y;
-    // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
+
     return (
       (x - edgeVertex1.x) * (y - edgeVertex2.y) ==
       (x - edgeVertex2.x) * (y - edgeVertex1.y)
@@ -715,7 +694,6 @@ class GameView {
       const vertex1 = this.fullVertex[i];
       const vertex2 = this.fullVertex[i + 1];
 
-      // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
       const maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
       const minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
       const maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
@@ -733,6 +711,19 @@ class GameView {
       }
     }
   }
+
+  isSameEdge(edgeVertex1, edgeVertex2, boardVertex1, boardVertex2) {
+    (this.isSamePos(edgeVertex1, boardVertex1) &&
+      this.isSamePos(edgeVertex2, boardVertex2)) ||
+      (this.isSamePos(edgeVertex1, boardVertex2) &&
+        this.isSamePos(edgeVertex2, boardVertex1));
+  }
+
+  isSamePos(vertex1, vertex2) {
+    return vertex1.x === vertex2.x && vertex1.y === vertex2.y;
+  }
+
+  // Drawing related
 
   drawVertex() {
     const width = 450;
@@ -825,15 +816,6 @@ class Level {
     this.goal = Stats.goal[this.stage];
 
     this.draw();
-  }
-
-  draw2() {
-    this.drawVertex();
-    for (let i = 0; i < this.goal.length - 1; i++) {
-      const vertexPos1 = this.goal[i];
-      const vertexPos2 = this.goal[i + 1];
-      this.drawEdge([vertexPos1, vertexPos2]);
-    }
   }
 
   draw() {

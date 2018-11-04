@@ -6,62 +6,36 @@
 
 `Line Weaver` is a mathematical brain teaser that challenges the player to weave a single line into wonderful patterns. It is built entirely in `JavaScript` and utilizes `Canvas` to interact with the player.
 
-## Functionality and MVP Features
-
-- Users can view board and patterns
-
-- Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
-
 ## Architecture and Technologies
 
 - Vanilla `JavaScript` for overall structure and game logic
 - `HTML5 Canvas` for DOM manipulation and rendering
 - `Webpack` to bundle and serve up the various scripts
 
-**Wireframe**
+## Functionality and Features
 
-![](readme_img/wireframe.jpg)
+- Users can view board and patterns
+- Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
+- Users can undo last move and reset the current level
 
-## Implementation Timeline
+## UI
 
-**Day 1:**
+`Line Weaver` uses simple and easy to understand UI design with delightful colors.
 
-- [x] Complete basic page skeleton
+<img src="assets/images/UI.jpg" height="400px" >
+<img src="assets/images/level-clear.jpg" height="400px" >
 
-- [x] Complete board design and rendering
+## Implementation
 
-**Day 2:**
+**On-edge-click detection && Edge crossing determination**
 
-- [x] Draw different types of vertex
+![](assets/images/edge-crossing-detection.gif)
 
-- [x] Attach event listeners
+**Level clear determination**
 
-- [x] Implement edge-clicking related logic
-
-**Day 3:**
-
-- [x] Implement detect nearby vertex and attach edges related logic
-
-- [x] Implement edges conflict related logic
-
-**Day 4:**
-
-- [x] Finish off main game logic
-
-- [x] Implement levels, Write AI logic to populate levels
-
-- [x] Style page
-
-**Weekend (Day 5 & 6):**
-
-- [ ] Complete MVPs an iron out project
-
-- [ ] Test, debug, polish and deploy
-
-**Future Bonus Features**
+## Possible future features
 
 - Hints
-
 - Audio
-
+- Generate levels automatically
 - Mobile-friendly version
