@@ -113,6 +113,15 @@ class Edge {
     this.ctx.lineTo(this.vertex2.x, this.vertex2.y);
     this.ctx.stroke();
   }
+
+  equalYes(edge) {
+    return (
+      (this.vertex1.equalYes(edge.vertex1) &&
+        this.vertex2.equalYes(edge.vertex2)) ||
+      (this.vertex2.equalYes(edge.vertex1) &&
+        this.vertex1.equalYes(edge.vertex2))
+    );
+  }
 }
 
 module.exports = Edge;
@@ -188,6 +197,8 @@ module.exports = EdgeOverlapping;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+const Edge = __webpack_require__(/*! ./edge */ "./lib/edge.js");
+const Vertex = __webpack_require__(/*! ./vertex */ "./lib/vertex.js");
 const GameView = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
 const Level = __webpack_require__(/*! ./level */ "./lib/level.js");
 
@@ -213,19 +224,142 @@ class Game {
         player[i][0] !== this.level.goal[i][0] ||
         player[i][1] !== this.level.goal[i][1]
       ) {
-        return false;
+        return;
       }
     }
 
-    const para = document.createElement('p');
-    const node = document.createTextNode('LEVEL CLEARED');
-    para.appendChild(node);
+    this.renderModal();
+  }
 
-    const el = document.getElementById('message');
-    el.appendChild(para);
+  levelCleared2() {
+    const playerEdges = [];
+    for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
+      const startVertex = this.gameView.fullVertex[i];
+      const endVertex = this.gameView.fullVertex[i + 1];
+      const x0 = (startVertex.x - 45) / 90;
+      const y0 = (startVertex.y - 45) / 90;
+      const x1 = (endVertex.x - 45) / 90;
+      const y1 = (endVertex.y - 45) / 90;
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      for (let j = 4; j >= 1; j--) {
+        if (dx % j == 0 && dy % j == 0) {
+          for (let k = 0; k < j; k++) {
+            playerEdges.push(
+              new Edge({
+                vertex1: new Vertex({
+                  x: x0 + k * (dx / j),
+                  y: y0 + k * (dy / j)
+                }),
+                vertex2: new Vertex({
+                  x: x0 + (k + 1) * (dx / j),
+                  y: y0 + (k + 1) * (dy / j)
+                })
+              })
+            );
+          }
+          break;
+        }
+      }
+    }
+    const computerEdges = [];
+    for (let i = 0; i < this.level.goal.length; i++) {
+      const x0 = this.level.goal[i][0][0];
+      const y0 = this.level.goal[i][0][1];
+      const x1 = this.level.goal[i][1][0];
+      const y1 = this.level.goal[i][1][1];
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      for (let j = 4; j >= 1; j--) {
+        if (dx % j == 0 && dy % j == 0) {
+          for (let k = 0; k < j; k++) {
+            computerEdges.push(
+              new Edge({
+                vertex1: new Vertex({
+                  x: x0 + k * (dx / j),
+                  y: y0 + k * (dy / j)
+                }),
+                vertex2: new Vertex({
+                  x: x0 + (k + 1) * (dx / j),
+                  y: y0 + (k + 1) * (dy / j)
+                })
+              })
+            );
+          }
+          break;
+        }
+      }
+    }
 
-    console.log('cleared');
-    return true;
+    if (playerEdges.length != computerEdges.length) {
+      return;
+    }
+
+    for (let i = 0; i < computerEdges.length; i++) {
+      let found = playerEdges.reduce(
+        (acc, ele) => acc || ele.equalYes(computerEdges[i]),
+        false
+      );
+      if (!found) {
+        return;
+      }
+    }
+
+    this.renderModal();
+  }
+
+  // helper
+
+  renderModal() {
+    const messageUl = document.getElementById('message');
+    messageUl.className = '';
+    const li1 = document.createElement('li');
+    const li2 = document.createElement('li');
+
+    if (this.stage < 12) {
+      li1.appendChild(document.createTextNode(`Level ${this.stage} cleared!`));
+      li2.appendChild(document.createTextNode('NEXT'));
+      messageUl.appendChild(li1);
+      messageUl.appendChild(li2);
+
+      li2.addEventListener('click', e => {
+        this.handleStageClear();
+        setTimeout(() => {
+          messageUl.className = 'display-none';
+          messageUl.removeChild(li1);
+          messageUl.removeChild(li2);
+        }, 200);
+      });
+    } else {
+      li1.appendChild(
+        document.createTextNode("Congradulations! You've cleared all levels!")
+      );
+      li2.appendChild(document.createTextNode('PLAY AGAIN'));
+      messageUl.appendChild(li1);
+      messageUl.appendChild(li2);
+      li2.addEventListener('click', e => {
+        this.handleResetGame();
+        setTimeout(() => {
+          messageUl.className = 'display-none';
+          messageUl.removeChild(li1);
+          messageUl.removeChild(li2);
+        }, 200);
+      });
+    }
+  }
+
+  handleStageClear() {
+    this.stage += 1;
+    this.gameView.ctx.clearRect(0, 0, 450, 450);
+    this.level.ctx.clearRect(0, 0, 216, 216);
+    this.buildGraph();
+  }
+
+  handleResetGame() {
+    this.stage = 1;
+    this.gameView.ctx.clearRect(0, 0, 450, 450);
+    this.level.ctx.clearRect(0, 0, 216, 216);
+    this.buildGraph();
   }
 
   buildGraph() {
@@ -246,7 +380,7 @@ class Game {
   enableCheckWinning() {
     const gameCanvas = document.getElementById('game-canvas');
     gameCanvas.addEventListener('mouseup', e =>
-      setTimeout(this.levelCleared.bind(this), 250)
+      setTimeout(this.levelCleared2.bind(this), 250)
     );
   }
 
@@ -537,14 +671,11 @@ class GameView {
     const x = vertex.x;
     const y = vertex.y;
     // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
-    let maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
-    let minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
-    let maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
-    let minY = edgeVertex1.y < edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
-    console.error(
-      (x - edgeVertex1.x) * (y - edgeVertex2.y) -
-        (x - edgeVertex2.x) * (y - edgeVertex1.y)
-    );
+    const maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
+    const minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
+    const maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
+    const minY = edgeVertex1.y < edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
+
     return (
       (x - edgeVertex1.x) * (y - edgeVertex2.y) -
         (x - edgeVertex2.x) * (y - edgeVertex1.y) >=
@@ -560,18 +691,27 @@ class GameView {
     // !(x < maxX && x > minX && y < maxY && y > minY)
   }
 
-  selectedEdge(x, y) {
-    let result = {};
+  isVertexExactlyOnEdge(edgeVertex1, edgeVertex2, vertex) {
+    const x = vertex.x;
+    const y = vertex.y;
+    // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
+    return (
+      (x - edgeVertex1.x) * (y - edgeVertex2.y) ==
+      (x - edgeVertex2.x) * (y - edgeVertex1.y)
+    );
+  }
 
+  selectedEdge(x, y) {
     for (let i = 0; i < this.fullVertex.length; i++) {
       if (i === this.fullVertex.length - 1) continue;
-      let vertex1 = this.fullVertex[i];
-      let vertex2 = this.fullVertex[i + 1];
+      const vertex1 = this.fullVertex[i];
+      const vertex2 = this.fullVertex[i + 1];
+
       // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
-      let maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
-      let minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
-      let maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
-      let minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
+      const maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
+      const minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
+      const maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
+      const minY = vertex1.y < vertex2.y ? vertex1.y : vertex2.y;
 
       if (
         (x - vertex1.x) * (y - vertex2.y) - (x - vertex2.x) * (y - vertex1.y) >=
@@ -630,18 +770,14 @@ class GameView {
   }
 
   initializeStartingVertex() {
-    const vertex1 = new VertexFull({
-      x: this.startingVertexPos[0][0],
-      y: this.startingVertexPos[0][1],
-      ctx: this.ctx
-    });
-    const vertex2 = new VertexFull({
-      x: this.startingVertexPos[1][0],
-      y: this.startingVertexPos[1][1],
-      ctx: this.ctx
-    });
-
-    return [vertex1, vertex2];
+    return this.startingVertexPos.map(
+      pos =>
+        new VertexFull({
+          x: pos[0],
+          y: pos[1],
+          ctx: this.ctx
+        })
+    );
   }
 
   populateVertex() {
@@ -680,14 +816,23 @@ class Level {
     this.stage = stage;
     this.goal = Stats.goal[this.stage];
 
-    this.drawFinal();
+    this.draw();
   }
 
-  drawFinal() {
+  draw2() {
     this.drawVertex();
     for (let i = 0; i < this.goal.length - 1; i++) {
       const vertexPos1 = this.goal[i];
       const vertexPos2 = this.goal[i + 1];
+      this.drawEdge([vertexPos1, vertexPos2]);
+    }
+  }
+
+  draw() {
+    this.drawVertex();
+    for (let i = 0; i < this.goal.length; i++) {
+      const vertexPos1 = this.goal[i][0];
+      const vertexPos2 = this.goal[i][1];
       this.drawEdge([vertexPos1, vertexPos2]);
     }
   }
@@ -702,6 +847,8 @@ class Level {
         this.ctx.beginPath();
         this.ctx.strokeStyle = 'lightgrey';
         this.ctx.fillStyle = 'lightgrey';
+        this.ctx.shadowBlur = 0;
+        this.ctx.globalAlpha = 1;
         this.ctx.arc(x, y, 6, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
@@ -783,10 +930,216 @@ module.exports = {
 
 module.exports = {
   game: {
-    1: [[1, 2], [3, 2]]
+    1: [[1, 3], [3, 3]],
+    2: [[1, 2], [2, 1], [3, 2], [1, 2], [2, 3], [3, 2]],
+    3: [[2, 2], [1, 0], [3, 0], [2, 2], [1, 4], [3, 4], [2, 2]],
+    4: [[1, 1], [3, 1], [3, 3], [1, 3], [1, 1]],
+    5: [[1, 1], [3, 1], [3, 3], [1, 3], [1, 1]],
+    6: [[1, 2], [1, 1], [2, 1], [2, 3], [3, 3], [3, 2]],
+    7: [[1, 1], [2, 1], [2, 2], [3, 2], [3, 3], [2, 3], [2, 2], [1, 2], [1, 1]],
+    8: [[2, 1], [1, 3], [3, 3], [2, 1]],
+    9: [[1, 2], [3, 2]],
+    10: [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]],
+    11: [[2, 1], [3, 3], [1, 3], [2, 1]],
+    12: [[1, 2], [3, 2]]
   },
   goal: {
-    1: [[1, 2], [2, 1], [3, 2]]
+    1: [
+      [[1, 3], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[1, 1], [2, 3]],
+      [[2, 3], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [3, 3]]
+    ],
+    2: [
+      [[1, 2], [0, 1]],
+      [[0, 1], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 1]],
+      [[3, 1], [4, 1]],
+      [[4, 1], [3, 2]],
+      [[3, 2], [2, 3]],
+      [[2, 3], [1, 2]],
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]]
+    ],
+    3: [
+      [[2, 2], [1, 2]],
+      [[1, 2], [0, 2]],
+      [[0, 2], [1, 0]],
+      [[1, 0], [2, 0]],
+      [[2, 0], [3, 0]],
+      [[3, 0], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [3, 4]],
+      [[3, 4], [2, 3]],
+      [[2, 3], [1, 4]],
+      [[1, 4], [2, 2]]
+    ],
+    4: [
+      [[1, 1], [1, 0]],
+      [[1, 0], [2, 0]],
+      [[2, 0], [3, 0]],
+      [[3, 0], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[2, 2], [4, 3]],
+      [[4, 3], [3, 3]],
+      [[3, 3], [3, 4]],
+      [[3, 4], [2, 4]],
+      [[2, 4], [1, 4]],
+      [[1, 4], [1, 3]],
+      [[1, 3], [0, 3]],
+      [[0, 3], [2, 2]]
+    ],
+    5: [
+      [[1, 1], [0, 2]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [2, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [4, 2]],
+      [[4, 2], [3, 1]],
+      [[3, 1], [2, 2]],
+      [[2, 2], [1, 1]]
+    ],
+    6: [
+      [[1, 2], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 2]],
+      [[3, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [1, 2]],
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]]
+    ],
+    7: [
+      [[1, 1], [2, 1]],
+      [[2, 1], [2, 2]],
+      [[2, 2], [1, 1]],
+      [[2, 2], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 3]],
+      [[1, 3], [2, 2]]
+    ],
+    8: [
+      [[2, 1], [3, 1]],
+      [[3, 1], [2, 0]],
+      [[2, 0], [1, 1]],
+      [[1, 1], [2, 1]],
+      [[2, 1], [3, 3]],
+      [[3, 3], [3, 4]],
+      [[3, 4], [2, 1]],
+      [[2, 1], [1, 4]],
+      [[1, 4], [1, 3]],
+      [[1, 3], [2, 1]]
+    ],
+    9: [
+      [[1, 2], [2, 2]],
+      [[2, 2], [3, 2]],
+      [[2, 2], [3, 4]],
+      [[3, 4], [4, 4]],
+      [[4, 4], [3, 1]],
+      [[3, 1], [2, 1]],
+      [[2, 1], [1, 1]],
+      [[1, 1], [0, 4]],
+      [[0, 4], [1, 4]],
+      [[1, 4], [2, 2]]
+    ],
+    10: [
+      [[0, 0], [0, 4]],
+      [[0, 0], [4, 0]],
+      [[4, 0], [4, 4]],
+      [[4, 4], [0, 4]],
+      [[0, 2], [2, 2]],
+      [[2, 2], [4, 2]],
+      [[2, 2], [2, 0]],
+      [[2, 2], [2, 4]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [2, 2]],
+      [[2, 2], [1, 1]],
+      [[1, 1], [2, 0]],
+      [[2, 2], [3, 1]],
+      [[3, 1], [4, 2]],
+      [[2, 2], [3, 3]],
+      [[3, 3], [2, 4]]
+    ],
+    11: [
+      [[2, 0], [3, 0]],
+      [[3, 0], [3, 1]],
+      [[3, 1], [2, 1]],
+      [[2, 1], [2, 0]],
+      [[3, 1], [4, 1]],
+      [[4, 1], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[3, 2], [3, 1]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [2, 1]],
+      [[2, 1], [1, 1]],
+      [[1, 1], [1, 2]],
+      [[1, 2], [2, 2]],
+      [[3, 2], [3, 3]],
+      [[3, 3], [2, 3]],
+      [[2, 3], [2, 2]],
+      [[2, 3], [1, 3]],
+      [[1, 3], [1, 2]],
+      [[1, 3], [0, 3]],
+      [[0, 3], [0, 2]],
+      [[0, 2], [1, 2]],
+      [[1, 3], [1, 4]],
+      [[1, 4], [2, 4]],
+      [[2, 4], [2, 3]]
+    ],
+    12: [
+      [[0, 0], [1, 1]],
+      [[1, 1], [0, 1]],
+      [[0, 1], [0, 0]],
+      [[1, 1], [2, 2]],
+      [[2, 2], [1, 2]],
+      [[1, 2], [1, 1]],
+      [[1, 2], [0, 2]],
+      [[0, 2], [0, 1]],
+      [[0, 1], [1, 2]],
+      [[0, 2], [0, 3]],
+      [[0, 2], [1, 3]],
+      [[1, 3], [0, 3]],
+      [[1, 2], [1, 3]],
+      [[1, 3], [2, 3]],
+      [[2, 3], [3, 3]],
+      [[3, 3], [3, 2]],
+      [[3, 2], [2, 2]],
+      [[2, 2], [1, 3]],
+      [[2, 2], [3, 3]],
+      [[0, 3], [0, 4]],
+      [[0, 4], [1, 4]],
+      [[1, 4], [0, 3]],
+      [[1, 4], [2, 3]],
+      [[1, 3], [1, 4]],
+      [[2, 3], [3, 4]],
+      [[3, 4], [3, 3]],
+      [[3, 4], [4, 3]],
+      [[4, 4], [3, 4]],
+      [[4, 4], [4, 3]],
+      [[4, 3], [3, 3]],
+      [[4, 3], [4, 2]],
+      [[4, 2], [3, 2]],
+      [[4, 2], [3, 3]],
+      [[4, 2], [4, 1]],
+      [[4, 1], [3, 1]],
+      [[3, 1], [3, 2]],
+      [[3, 2], [4, 1]],
+      [[2, 2], [3, 1]],
+      [[4, 1], [4, 0]],
+      [[3, 1], [4, 0]]
+    ]
   }
 };
 
@@ -809,6 +1162,10 @@ class Vertex {
 
   pos() {
     return [this.x, this.y];
+  }
+
+  equalYes(vertex) {
+    return this.x === vertex.x && this.y === vertex.y;
   }
 }
 
