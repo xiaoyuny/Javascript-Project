@@ -36,6 +36,8 @@
 
 In the game, edges have thickness, therefore the corss product can fall in a range instead of being a single value, and vertex `O` also needs to be between `A` and `B`.
 
+In code:
+
 ```Javascript
   selectedEdge(x, y) {
     for (let i = 0; i < this.fullVertex.length; i++) {
@@ -74,6 +76,8 @@ on the contratry, if `a` and `b` will cross, this action will form a crossed qua
 This is the basic concept of how `Line Weaver` checks edge conflicts.
 
 <img src="assets/images/cp-1.jpg" height="300px" > <img src="assets/images/cp-2.jpg" height="300px" >
+
+In code:
 
 ```Javascript
   hasConflicts(edgeVertex1, edgeVertex2) {
