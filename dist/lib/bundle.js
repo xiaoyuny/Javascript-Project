@@ -114,7 +114,7 @@ class Edge {
     this.ctx.stroke();
   }
 
-  equalYes(edge) {
+  equals(edge) {
     return (
       (this.vertex1.equalYes(edge.vertex1) &&
         this.vertex2.equalYes(edge.vertex2)) ||
@@ -207,88 +207,31 @@ class Game {
     this.stage = 1;
     this.gameCtx = gameCtx;
     this.levelCtx = levelCtx;
+    this.stageClearBind = this.handleStageClear.bind(this);
     this.buildGraph();
     this.enableUndoLastMove();
-    this.enableRestart();
+    this.enableNextLevel();
     this.enableCheckWinning();
   }
 
   levelCleared() {
-    const player = this.gameView.fullVertex
-      .map(el => [el.x, el.y])
-      .map(el => el.map(num => (num - 45) / 90));
-
-    if (player.length !== this.level.goal.length) return false;
-    for (let i = 0; i < player.length; i++) {
-      if (
-        player[i][0] !== this.level.goal[i][0] ||
-        player[i][1] !== this.level.goal[i][1]
-      ) {
-        return;
-      }
-    }
-
-    this.renderModal();
-  }
-
-  levelCleared2() {
-    const playerEdges = [];
+    let playerEdges = [];
     for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
-      const startVertex = this.gameView.fullVertex[i];
-      const endVertex = this.gameView.fullVertex[i + 1];
-      const x0 = (startVertex.x - 45) / 90;
-      const y0 = (startVertex.y - 45) / 90;
-      const x1 = (endVertex.x - 45) / 90;
-      const y1 = (endVertex.y - 45) / 90;
-      const dx = x1 - x0;
-      const dy = y1 - y0;
-      for (let j = 4; j >= 1; j--) {
-        if (dx % j == 0 && dy % j == 0) {
-          for (let k = 0; k < j; k++) {
-            playerEdges.push(
-              new Edge({
-                vertex1: new Vertex({
-                  x: x0 + k * (dx / j),
-                  y: y0 + k * (dy / j)
-                }),
-                vertex2: new Vertex({
-                  x: x0 + (k + 1) * (dx / j),
-                  y: y0 + (k + 1) * (dy / j)
-                })
-              })
-            );
-          }
-          break;
-        }
-      }
+      const values = [
+        this.gameView.fullVertex[i],
+        this.gameView.fullVertex[i + 1]
+      ].map(vertex => [(vertex.x - 45) / 90, (vertex.y - 45) / 90]);
+
+      playerEdges = playerEdges.concat(
+        this.edgeBreakdown(...values[0], ...values[1])
+      );
     }
-    const computerEdges = [];
+
+    let computerEdges = [];
     for (let i = 0; i < this.level.goal.length; i++) {
-      const x0 = this.level.goal[i][0][0];
-      const y0 = this.level.goal[i][0][1];
-      const x1 = this.level.goal[i][1][0];
-      const y1 = this.level.goal[i][1][1];
-      const dx = x1 - x0;
-      const dy = y1 - y0;
-      for (let j = 4; j >= 1; j--) {
-        if (dx % j == 0 && dy % j == 0) {
-          for (let k = 0; k < j; k++) {
-            computerEdges.push(
-              new Edge({
-                vertex1: new Vertex({
-                  x: x0 + k * (dx / j),
-                  y: y0 + k * (dy / j)
-                }),
-                vertex2: new Vertex({
-                  x: x0 + (k + 1) * (dx / j),
-                  y: y0 + (k + 1) * (dy / j)
-                })
-              })
-            );
-          }
-          break;
-        }
-      }
+      computerEdges = computerEdges.concat(
+        this.edgeBreakdown(...this.level.goal[i][0], ...this.level.goal[i][1])
+      );
     }
 
     if (playerEdges.length != computerEdges.length) {
@@ -297,7 +240,7 @@ class Game {
 
     for (let i = 0; i < computerEdges.length; i++) {
       let found = playerEdges.reduce(
-        (acc, ele) => acc || ele.equalYes(computerEdges[i]),
+        (acc, el) => acc || el.equals(computerEdges[i]),
         false
       );
       if (!found) {
@@ -306,6 +249,32 @@ class Game {
     }
 
     this.renderModal();
+  }
+
+  edgeBreakdown(x0, y0, x1, y1) {
+    const result = [];
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+
+    for (let j = 4; j >= 1; j--) {
+      if (dx % j == 0 && dy % j == 0) {
+        for (let k = 0; k < j; k++) {
+          result.push(
+            new Edge({
+              vertex1: new Vertex({
+                x: x0 + k * (dx / j),
+                y: y0 + k * (dy / j)
+              }),
+              vertex2: new Vertex({
+                x: x0 + (k + 1) * (dx / j),
+                y: y0 + (k + 1) * (dy / j)
+              })
+            })
+          );
+        }
+        return result;
+      }
+    }
   }
 
   // helper
@@ -343,6 +312,7 @@ class Game {
           messageUl.className = 'display-none';
           messageUl.removeChild(li1);
           messageUl.removeChild(li2);
+          this.enableNextLevel();
         }, 200);
       });
     }
@@ -350,6 +320,13 @@ class Game {
 
   handleStageClear() {
     this.stage += 1;
+
+    if (this.stage === 12) {
+      const nextLevel = document.getElementById('next-level');
+      nextLevel.removeEventListener('click', this.stageClearBind);
+      this.renderModal();
+    }
+
     this.gameView.ctx.clearRect(0, 0, 450, 450);
     this.level.ctx.clearRect(0, 0, 216, 216);
     this.buildGraph();
@@ -377,10 +354,15 @@ class Game {
     restart.addEventListener('click', this.handleRestart.bind(this));
   }
 
+  enableNextLevel() {
+    const nextLevel = document.getElementById('next-level');
+    nextLevel.addEventListener('click', this.stageClearBind);
+  }
+
   enableCheckWinning() {
     const gameCanvas = document.getElementById('game-canvas');
     gameCanvas.addEventListener('mouseup', e =>
-      setTimeout(this.levelCleared2.bind(this), 250)
+      setTimeout(this.levelCleared.bind(this), 250)
     );
   }
 
@@ -491,13 +473,6 @@ class GameView {
         const prevVertex = this.fullVertex[this.index];
         const nextVertex = this.fullVertex[this.index + 1];
 
-        // console.log('part1', this.hasConflicts(prevVertex, newVertex));
-        // console.log('part2', this.hasConflicts(nextVertex, newVertex));
-        // console.log(
-        //   'part3',
-        //   this.selfConflicting(this.selected[0], newVertex, this.selected[1])
-        // );
-
         if (
           this.hasConflicts(prevVertex, newVertex) ||
           this.hasConflicts(nextVertex, newVertex) ||
@@ -581,8 +556,7 @@ class GameView {
 
   hasConflicts(edgeVertex1, edgeVertex2) {
     const result = [];
-    for (let i = 0; i < this.fullVertex.length; i++) {
-      if (i === this.fullVertex.length - 1) continue;
+    for (let i = 0; i < this.fullVertex.length - 1; i++) {
       if (i === this.index) continue;
       const boardVertex1 = this.fullVertex[i];
       const boardVertex2 = this.fullVertex[i + 1];
@@ -593,25 +567,25 @@ class GameView {
         edgeVertex2,
         boardVertex2
       ];
-      const convolution = [];
+      const crossProduct = [];
 
       for (let i = 0; i < 4; i++) {
         const vertex1 = vertexArray[i];
         const vertex2 = vertexArray[(i + 1) % 4];
         const vertex3 = vertexArray[(i + 2) % 4];
 
-        convolution.push(
+        crossProduct.push(
           (vertex3.x - vertex1.x) * (vertex3.y - vertex2.y) -
             (vertex3.x - vertex2.x) * (vertex3.y - vertex1.y)
         );
       }
 
       if (
-        convolution.every(value => value > 0) ||
-        convolution.every(value => value < 0)
+        crossProduct.every(value => value > 0) ||
+        crossProduct.every(value => value < 0)
       ) {
         result.push(true);
-      } else if (convolution.every(value => value === 0)) {
+      } else if (crossProduct.every(value => value === 0)) {
         return (
           this.isSameEdge(
             edgeVertex1,
@@ -646,31 +620,10 @@ class GameView {
     return isEdgeConflicting1 || isEdgeConflicting2;
   }
 
-  isSameEdge(edgeVertex1, edgeVertex2, boardVertex1, boardVertex2) {
-    if (
-      this.samePos(edgeVertex1, boardVertex1) &&
-      this.samePos(edgeVertex2, boardVertex2)
-    ) {
-      return true;
-    }
-
-    if (
-      this.samePos(edgeVertex1, boardVertex2) &&
-      this.samePos(edgeVertex2, boardVertex1)
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  samePos(vertex1, vertex2) {
-    return vertex1.x === vertex2.x && vertex1.y === vertex2.y;
-  }
-
   isVertexOnEdge(edgeVertex1, edgeVertex2, vertex) {
     const x = vertex.x;
     const y = vertex.y;
-    // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
+
     const maxX = edgeVertex1.x > edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
     const minX = edgeVertex1.x < edgeVertex2.x ? edgeVertex1.x : edgeVertex2.x;
     const maxY = edgeVertex1.y > edgeVertex2.y ? edgeVertex1.y : edgeVertex2.y;
@@ -694,7 +647,7 @@ class GameView {
   isVertexExactlyOnEdge(edgeVertex1, edgeVertex2, vertex) {
     const x = vertex.x;
     const y = vertex.y;
-    // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
+
     return (
       (x - edgeVertex1.x) * (y - edgeVertex2.y) ==
       (x - edgeVertex2.x) * (y - edgeVertex1.y)
@@ -707,7 +660,6 @@ class GameView {
       const vertex1 = this.fullVertex[i];
       const vertex2 = this.fullVertex[i + 1];
 
-      // (x3-x1) * (y3-y2) - (x3-x2) * (y3-y1) === 0
       const maxX = vertex1.x > vertex2.x ? vertex1.x : vertex2.x;
       const minX = vertex1.x < vertex2.x ? vertex1.x : vertex2.x;
       const maxY = vertex1.y > vertex2.y ? vertex1.y : vertex2.y;
@@ -725,6 +677,19 @@ class GameView {
       }
     }
   }
+
+  isSameEdge(edgeVertex1, edgeVertex2, boardVertex1, boardVertex2) {
+    (this.isSamePos(edgeVertex1, boardVertex1) &&
+      this.isSamePos(edgeVertex2, boardVertex2)) ||
+      (this.isSamePos(edgeVertex1, boardVertex2) &&
+        this.isSamePos(edgeVertex2, boardVertex1));
+  }
+
+  isSamePos(vertex1, vertex2) {
+    return vertex1.x === vertex2.x && vertex1.y === vertex2.y;
+  }
+
+  // Drawing related
 
   drawVertex() {
     const width = 450;
@@ -817,15 +782,6 @@ class Level {
     this.goal = Stats.goal[this.stage];
 
     this.draw();
-  }
-
-  draw2() {
-    this.drawVertex();
-    for (let i = 0; i < this.goal.length - 1; i++) {
-      const vertexPos1 = this.goal[i];
-      const vertexPos2 = this.goal[i + 1];
-      this.drawEdge([vertexPos1, vertexPos2]);
-    }
   }
 
   draw() {
