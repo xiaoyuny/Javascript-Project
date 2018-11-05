@@ -112,28 +112,31 @@ This is the basic concept of how `Line Weaver` checks edge conflicts.
 
 **Level clear determination**
 
+Breakdown both players' edges and solution edges into edges as small as possible, then compare to make sure edges won't be different because of the vertexes on them.
+
+<img src="assets/images/clear.jpg" width="350px" >
+
+In code:
+
 ```Javascript
-levelCleared() {
+  levelCleared() {
     let playerEdges = [];
     for (let i = 0; i < this.gameView.fullVertex.length - 1; i++) {
-      const startVertex = this.gameView.fullVertex[i];
-      const endVertex = this.gameView.fullVertex[i + 1];
-      const x0 = (startVertex.x - 45) / 90;
-      const y0 = (startVertex.y - 45) / 90;
-      const x1 = (endVertex.x - 45) / 90;
-      const y1 = (endVertex.y - 45) / 90;
+      const values = [
+        this.gameView.fullVertex[i],
+        this.gameView.fullVertex[i + 1]
+      ].map(vertex => [(vertex.x - 45) / 90, (vertex.y - 45) / 90]);
 
-      playerEdges = playerEdges.concat(this.calculateEdges(x0, y0, x1, y1));
+      playerEdges = playerEdges.concat(
+        this.edgeBreakdown(...values[0], ...values[1])
+      );
     }
 
     let computerEdges = [];
     for (let i = 0; i < this.level.goal.length; i++) {
-      const x0 = this.level.goal[i][0][0];
-      const y0 = this.level.goal[i][0][1];
-      const x1 = this.level.goal[i][1][0];
-      const y1 = this.level.goal[i][1][1];
-
-      computerEdges = computerEdges.concat(this.calculateEdges(x0, y0, x1, y1));
+      computerEdges = computerEdges.concat(
+        this.edgeBreakdown(...this.level.goal[i][0], ...this.level.goal[i][1])
+      );
     }
 
     if (playerEdges.length != computerEdges.length) {
@@ -142,7 +145,7 @@ levelCleared() {
 
     for (let i = 0; i < computerEdges.length; i++) {
       let found = playerEdges.reduce(
-        (acc, ele) => acc || ele.equalYes(computerEdges[i]),
+        (acc, el) => acc || el.equals(computerEdges[i]),
         false
       );
       if (!found) {
@@ -153,11 +156,11 @@ levelCleared() {
     this.renderModal();
   }
 
-  calculateEdges(x0, y0, x1, y1) {
+  edgeBreakdown(x0, y0, x1, y1) {
     const result = [];
-
     const dx = x1 - x0;
     const dy = y1 - y0;
+
     for (let j = 4; j >= 1; j--) {
       if (dx % j == 0 && dy % j == 0) {
         for (let k = 0; k < j; k++) {
