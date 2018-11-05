@@ -32,7 +32,7 @@
 
 <img src="assets/images/corss-product.jpg" height="200px" >
 
-| **_a_** × **_b_** | = 0 <=> the area formed by edge `a` and `b` is 0 <=> edge `a` and edge `b` are on the same line <=> vertex `A`, `O`, `B` are on the same line.
+| **_a_** × **_b_** | = 0 <=> the area formed by edge `a` and `b` is zero <=> edge `a` and edge `b` are on the same line <=> vertex `A`, `O`, `B` are on the same line.
 
 In the game, edges have thickness, therefore the corss product can fall in a range instead of being a single value, and vertex `O` also needs to be between `A` and `B`.
 
