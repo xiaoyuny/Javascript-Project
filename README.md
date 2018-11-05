@@ -18,17 +18,17 @@
 - Users can interact with the game by dragging and weaving the line according to the provided pattern to clear a level
 - Users can undo last move and reset the current level
 
-## UI
+# UI
 
 `Line Weaver` uses simple and easy to understand UI design with delightful colors.
 
 <img src="assets/images/UI.jpg" height="360px" > <img src="assets/images/level-clear.jpg" height="360px" >
 
-## Implementation
+# Implementation
 
 ![](assets/images/invalid-move.gif)
 
-**On-edge-click detection**
+## **On-edge-click detection**
 
 <img src="assets/images/corss-product.jpg" height="200px" >
 
@@ -62,7 +62,7 @@ In the game, edges have thickness, therefore the corss product can fall in a ran
   }
 ```
 
-**Edge crossing determination**
+## **Edge crossing determination**
 
 In the following image,
 Edge `a` - formed by vertex `A` and `B`,
@@ -110,7 +110,7 @@ This is the basic concept of how `Line Weaver` checks edge conflicts.
         ......
 ```
 
-**Level clear determination**
+## **Level clear determination**
 
 Breakdown both players' edges and solution edges into edges as small as possible, then compare to make sure edges won't be different because of the vertexes on them.
 
@@ -183,7 +183,7 @@ In code:
   }
 ```
 
-## Possible future features
+# Possible future features
 
 - Hints
 - Audio
