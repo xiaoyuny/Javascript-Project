@@ -1,39 +1,44 @@
 <html>
+  <head>
+    <title>Line Weaver</title>
+    <script type="application/javascript" src="dist/lib/bundle.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css" />
+    <link rel="icon" type="image/png" href="assets/images/icon.png" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+      integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poor+Story"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <title>Line Weaver</title>
-  <script type="application/javascript" src="dist/lib/bundle.js"></script>
-  <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css">
-  <link rel="icon" type="image/png" href="assets/images/icon.png">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
-    crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Poor+Story" rel="stylesheet">
-</head>
+  <body>
+    <h1>Line Weaver</h1>
+    <div class="canvases">
+      <div class="left-side">
+        <ul class="buttons">
+          <div class="first-two">
+            <a href="https://github.com/xiaoyuny/Line-Weaver" target="_blank">
+              <li><i class="fab fa-github"></i></li>
+            </a>
+            <a href="https://www.linkedin.com/in/xiaoyuny/" target="_blank">
+              <li><i class="fab fa-linkedin-in"></i></li>
+            </a>
+          </div>
+          <div class="last-two">
+            <li id="undo"><i class="fas fa-undo-alt"></i></li>
+            <li id="next-level"><i class="fas fa-forward"></i></li>
+          </div>
+        </ul>
+        <canvas id="level-canvas"></canvas>
+      </div>
 
-<body>
-  <h1>Line Weaver</h1>
-  <div class="canvases">
-    <div class="left-side">
-      <ul class="buttons">
-        <div class="first-two">
-          <a href="https://github.com/xiaoyuny/Line-Weaver" target="_blank">
-            <li><i class="fab fa-github"></i></li>
-          </a>
-          <a href="https://www.linkedin.com/in/xiaoyun-yang-2b6a0a80/" target="_blank">
-            <li><i class="fab fa-linkedin-in"></i></li>
-          </a>
-        </div>
-        <div class="last-two">
-          <li id="undo"><i class="fas fa-undo-alt"></i></li>
-          <li id="next-level"><i class="fas fa-forward"></i></li>
-        </div>
-      </ul>
-      <canvas id="level-canvas"></canvas>
+      <ul id="message" class="display-none"></ul>
+      <canvas id="game-canvas"></canvas>
     </div>
-
-    <ul id="message" class="display-none"></ul>
-    <canvas id="game-canvas"></canvas>
-  </div>
-</body>
-
+  </body>
 </html>
