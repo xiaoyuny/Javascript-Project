@@ -636,8 +636,12 @@ class GameView {
       (x - edgeVertex1.x) * (y - edgeVertex2.y) -
         (x - edgeVertex2.x) * (y - edgeVertex1.y) <=
         5000 &&
-      ((x < maxX && x > minX) || (y < maxY && y > minY))
-    );
+      ((x < maxX && x > minX) || (y < maxY && y > minY)) &&
+      (x - edgeVertex1.x) * (y - edgeVertex2.y) -
+        (x - edgeVertex2.x) * (y - edgeVertex1.y) !==
+        0
+    ); //&&
+    // !(x < maxX && x > minX && y < maxY && y > minY)
   }
 
   isVertexExactlyOnEdge(edgeVertex1, edgeVertex2, vertex) {
